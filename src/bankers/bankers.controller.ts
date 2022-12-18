@@ -6,7 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { Pagination, PaginationDto } from 'src/pagination';
 
 import { BankersService } from './bankers.service';
 import { CreateBankerDto } from './dto/create-banker.dto';
@@ -25,19 +27,39 @@ export class BankersController {
     }
   }
 
+  @Get('all')
+  async findAllWithoutPagination() {
+    try {
+      return this.bankersService.findAllWithoutPagination();
+    } catch (e) {
+      throw e;
+    }
+  }
+
   @Get()
-  findAll() {
-    return this.bankersService.findAll();
+  async findAllWithPagination(@Pagination() pagination: PaginationDto) {
+    try {
+      return this.bankersService.findAllWithPagination(pagination);
+    } catch (e) {
+      throw e;
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bankersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return this.bankersService.findOne(id);
+    } catch (e) {
+      throw e;
+    }
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBankerDto: UpdateBankerDto) {
-    return this.bankersService.update(+id, updateBankerDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBankerDto: UpdateBankerDto,
+  ) {
+    return this.bankersService.update(id, updateBankerDto);
   }
 
   @Delete(':id')
