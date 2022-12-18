@@ -1,6 +1,5 @@
 import { PaginationDto } from './pagination.dto';
 
-
 export const formatResponse = (
   pagination: PaginationDto,
   total: number,
@@ -23,7 +22,7 @@ export const formatResponse = (
           }&size=${pagination.size}`,
         },
         last: {
-          href: `${process.env.DOMAIN}/v1/notes?page=${lastPage}&size=${pagination.size}`,
+          href: `${process.env.DOMAIN}/v1/${resource}?page=${lastPage}&size=${pagination.size}`,
         },
       },
       data,
@@ -35,10 +34,10 @@ export const formatResponse = (
     size: pagination.size,
     links: {
       self: {
-        href: `${process.env.DOMAIN}/v1/notes?page=${pagination.page}&size=${pagination.size}`,
+        href: `${process.env.DOMAIN}/v1/${resource}?page=${pagination.page}&size=${pagination.size}`,
       },
       last: {
-        href: `${process.env.DOMAIN}/v1/notes?page=${lastPage}&size=${pagination.size}`,
+        href: `${process.env.DOMAIN}/v1/${resource}?page=${lastPage}&size=${pagination.size}`,
       },
     },
     data,
