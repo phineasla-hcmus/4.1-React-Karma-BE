@@ -11,8 +11,8 @@ async function main() {
     let lastName = faker.name.lastName();
     let fullName = firsName + ' ' + lastName;
     let username = faker.random.numeric(12);
-    let banker = await prisma.nhanVien.upsert({
-      create: {
+    let banker = await prisma.nhanVien.create({
+      data: {
         hoTen: fullName,
         sdt: faker.phone.number('09##-###-###'),
         taiKhoan: {
@@ -23,25 +23,16 @@ async function main() {
           },
         },
       },
-      where: {
-        maNV: 1,
-      },
-      update: {},
     });
   }
-
   //1 Admin
-  // let admin = await prisma.taiKhoan.upsert({
-  //   create: {
-  //     tenDangNhap:  faker.random.numeric(12),
-  //     matKhau: hashed,
-  //     vaiTro: 'Admin',
-  //   },
-  //   where: {
-  //     maTK: 1,
-  //   },
-  //   update: {},
-  // });
+  let admin = await prisma.taiKhoan.create({
+    data: {
+      tenDangNhap: faker.random.numeric(12),
+      matKhau: hashed,
+      vaiTro: 'Admin',
+    },
+  });
 
   // 5 user
   for (let i = 1; i < 6; i++) {
@@ -50,8 +41,8 @@ async function main() {
     let fullName = firsName + ' ' + lastName;
     let username = faker.random.numeric(12);
 
-    let user = await prisma.khachHang.upsert({
-      create: {
+    let user = await prisma.khachHang.create({
+      data: {
         hoTen: fullName,
         sdt: faker.phone.number('09##-###-###'),
         email: faker.internet.email(firsName, lastName, 'gmail'),
@@ -63,23 +54,15 @@ async function main() {
           },
         },
       },
-      where: {
-        maKH: 1,
-      },
-      update: {},
     });
 
     // taikhoanthanhtoan cho user
-    let tkthanhtoan = await prisma.taiKhoanThanhToan.upsert({
-      create: {
+    let tkthanhtoan = await prisma.taiKhoanThanhToan.create({
+      data: {
         soTK: faker.finance.creditCardNumber('### ### ####'),
         soDu: +faker.finance.account(),
         maTK: user.maTK,
       },
-      where: {
-        maTK: user.maTK,
-      },
-      update: {},
     });
   }
 }
