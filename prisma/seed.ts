@@ -60,10 +60,75 @@ async function main() {
     let tkthanhtoan = await prisma.taiKhoanThanhToan.create({
       data: {
         soTK: faker.finance.creditCardNumber('### ### ####'),
-        soDu: +faker.finance.account(),
+        soDu: +faker.finance.account(8),
         maTK: user.maTK,
       },
     });
+  }
+  //lay danhsach user hien tai
+  let list = await prisma.taiKhoan.findMany({
+    where: {
+      vaiTro: 'User',
+    },
+    orderBy: {
+      maTK: 'asc',
+    },
+    include: { taiKhoanThanhToan: true },
+  });
+  let n = list.length;
+
+  //danhsachdaluu
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 1; j < n; j++) {
+      await prisma.danhSachDaLuu.create({
+        data: {
+          maTK: list[i].maTK,
+          nguoiDung: list[j].maTK,
+          tenGoiNho: faker.lorem.word(),
+        },
+      });
+    }
+  }
+
+  for (let i = 0; i < n; i++) {
+    let count = 0;
+    // chuyen khoan
+    while (count < 8) {
+      let rand = faker.datatype.number({
+        min: 0,
+        max: n - 1,
+      });
+      if (rand != i) {
+        await prisma.chuyenKhoanNoiBo.create({
+          data: {
+            nguoiChuyen: list[i].taiKhoanThanhToan.soTK,
+            nguoiNhan: list[rand].taiKhoanThanhToan.soTK,
+            soTien: +faker.finance.account(6),
+            noiDungCK: faker.lorem.sentence(),
+          },
+        });
+        count++;
+      }
+    }
+    //duoc chuyen khoan
+    count = 0;
+    while (count < 8) {
+      let rand = faker.datatype.number({
+        min: 0,
+        max: n - 1,
+      });
+      if (rand != i) {
+        await prisma.chuyenKhoanNoiBo.create({
+          data: {
+            nguoiNhan: list[i].taiKhoanThanhToan.soTK,
+            nguoiChuyen: list[rand].taiKhoanThanhToan.soTK,
+            soTien: +faker.finance.account(6),
+            noiDungCK: faker.lorem.sentence(),
+          },
+        });
+        count++;
+      }
+    }
   }
 }
 
