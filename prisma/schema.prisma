@@ -7,20 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model chuyenKhoan {
-  maCK            Int               @id @default(autoincrement()) @map("MACK")
-  nguoiChuyen     String            @map("NGUOICHUYEN") @db.VarChar(12)
-  nguoiNhan       String            @map("NGUOINHAN") @db.VarChar(12)
-  soTien          Int               @map("SOTIEN")
-  noiDungCK       String?           @map("NOIDUNGCK")
-  chuyenNoiBo     Boolean           @map("CHUYENNOIBO")
-  ngayCK          DateTime          @map("NGAYCK") @db.Date
-  nganHang        Int?              @map("NGANHANG")
-  nganHangLienKet nganHangLienKet?  @relation(fields: [nganHang], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_NGANHANGLIENKET")
-  taiKhoanChuyen  taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN", fields: [nguoiChuyen], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN1")
-  taiKhoanNhan    taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN", fields: [nguoiNhan], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN2")
+model chuyenKhoanNoiBo {
+  maCK           Int               @id @default(autoincrement()) @map("MACK")
+  nguoiChuyen    String            @map("NGUOICHUYEN") @db.VarChar(12)
+  nguoiNhan      String            @map("NGUOINHAN") @db.VarChar(12)
+  soTien         Int               @map("SOTIEN")
+  noiDungCK      String?           @map("NOIDUNGCK")
+  ngayCK         DateTime          @default(now()) @map("NGAYCK")
+  taiKhoanChuyen taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN", fields: [nguoiChuyen], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN1")
+  taiKhoanNhan   taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN", fields: [nguoiNhan], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN2")
 
-  @@map("CHUYENKHOAN")
+  @@map("CHUYENKHOANNOIBO")
 }
 
 model danhSachDaLuu {
@@ -45,13 +42,27 @@ model khachHang {
   @@map("KHACHHANG")
 }
 
+model chuyenKhoanNganHangNgoai {
+  maCKN      Int               @id @default(autoincrement()) @map("MACKN")
+  tkTrong    String            @map("TKTRONG") @db.VarChar(12)
+  tkNgoai    String            @map("TKNGOAI") @db.VarChar(12)
+  soTien     Int               @map("SOTIEN")
+  maNganHang Int               @map("MANGANHANG")
+  noiDungCK  String            @map("NOIDUNGCK") @db.Text
+  thoiGian   DateTime          @default(now()) @map("THOIGIAN")
+  nganHangLK nganHangLienKet   @relation(fields: [maNganHang], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGANHANGNGOAI")
+  taiKhoan   taiKhoanThanhToan @relation(fields: [tkTrong], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
+
+  @@map("CHUYENKHOANNGANHANGNGOAI")
+}
+
 model nganHangLienKet {
-  maNH        Int           @id @default(autoincrement()) @map("MANH")
-  tenNH       String        @map("TENNH") @db.VarChar(50)
-  kPublic     String        @map("KPUBLIC") @db.VarChar(256)
-  kPrivate    String        @map("KPRIVATE") @db.VarChar(256)
-  kSecret     String        @map("KSECRET") @db.VarChar(256)
-  chuyenKhoan chuyenKhoan[]
+  maNH                     Int                        @id @default(autoincrement()) @map("MANH")
+  tenNH                    String                     @map("TENNH") @db.VarChar(50)
+  kPublic                  String                     @map("KPUBLIC") @db.VarChar(256)
+  kPrivate                 String                     @map("KPRIVATE") @db.VarChar(256)
+  kSecret                  String                     @map("KSECRET") @db.VarChar(256)
+  chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
 
   @@map("NGANHANGLIENKET")
 }
@@ -75,7 +86,7 @@ model nhanVien {
   maNV     Int       @id @default(autoincrement()) @map("MANV")
   hoTen    String    @map("HOTEN") @db.VarChar(30)
   sdt      String    @map("SDT") @db.VarChar(15)
-  maTK     Int?      @map("MATK")
+  maTK     Int?      @unique @map("MATK")
   taiKhoan taiKhoan? @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHANVIEN_TAIKHOAN")
 
   @@map("NHANVIEN")
@@ -83,7 +94,7 @@ model nhanVien {
 
 model taiKhoan {
   maTK              Int                @id @default(autoincrement()) @map("MATK")
-  tenDangNhap       String             @unique @map("TENDANGNHAP") @db.VarChar(20)
+  tenDangNhap       String             @unique @map("TENDANGNHAP") @db.VarChar(12)
   matKhau           String             @map("MATKHAU") @db.VarChar(100)
   vaiTro            vaitro             @map("VAITRO")
   refreshToken      String?            @map("REFRESHTOKEN") @db.VarChar(256)
@@ -91,20 +102,23 @@ model taiKhoan {
   thuocDanhSach     danhSachDaLuu[]    @relation("DANHSACHDALUU_NGUOIDUNGToTAIKHOAN")
   dsNhanNo          nhacNo[]           @relation("NHACNO_NGUOIGUIToTAIKHOAN")
   duocNhacNo        nhacNo[]           @relation("NHACNO_NGUOINHANToTAIKHOAN")
-  nhanVien          nhanVien[]
+  nhanVien          nhanVien?
   taiKhoanThanhToan taiKhoanThanhToan?
   khachHang         khachHang?
+  hoatDong          Boolean            @default(true)
 
   @@map("TAIKHOAN")
 }
 
 model taiKhoanThanhToan {
-  soTK            String        @id @map("SOTK") @db.VarChar(12)
-  soDu            Int           @map("SODU")
-  maTK            Int?          @unique @map("MATK")
-  chuyenKhoan     chuyenKhoan[] @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN")
-  duocChuyenKhoan chuyenKhoan[] @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN")
-  taiKhoan        taiKhoan?     @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_TAIKHOANTHANHTOAN_TAIKHOAN")
+  soTK                     String                     @id @map("SOTK") @db.VarChar(12)
+  soDu                     Int                        @map("SODU")
+  maTK                     Int?                       @unique @map("MATK")
+  hoatDong                 Boolean                    @default(true)
+  chuyenKhoan              chuyenKhoanNoiBo[]         @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN")
+  duocChuyenKhoan          chuyenKhoanNoiBo[]         @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN")
+  taiKhoan                 taiKhoan?                  @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_TAIKHOANTHANHTOAN_TAIKHOAN")
+  chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
 
   @@map("TAIKHOANTHANHTOAN")
 }
