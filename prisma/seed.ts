@@ -31,17 +31,17 @@ async function main() {
   }
 
   //1 Admin
-  // let admin = await prisma.taiKhoan.upsert({
-  //   create: {
-  //     tenDangNhap:  faker.random.numeric(12),
-  //     matKhau: hashed,
-  //     vaiTro: 'Admin',
-  //   },
-  //   where: {
-  //     maTK: 1,
-  //   },
-  //   update: {},
-  // });
+  let admin = await prisma.taiKhoan.upsert({
+    create: {
+      tenDangNhap: faker.random.numeric(12),
+      matKhau: hashed,
+      vaiTro: 'Admin',
+    },
+    where: {
+      maTK: 1,
+    },
+    update: {},
+  });
 
   // 5 user
   for (let i = 1; i < 6; i++) {
