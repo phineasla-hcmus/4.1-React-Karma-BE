@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -28,6 +33,17 @@ export class PaymentAccountsService {
         },
       },
     });
-    return raw[0];
+    const user = raw[0];
+
+    if (!user) {
+      throw new HttpException(
+        { errorId: HttpStatus.NOT_FOUND, message: 'User not found' },
+        HttpStatus.OK,
+      );
+    }
+    return {
+      soTK: user.soTK,
+      hoTen: user.taiKhoan.khachHang.hoTen,
+    };
   }
 }
