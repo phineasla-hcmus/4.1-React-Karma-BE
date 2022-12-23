@@ -62,6 +62,7 @@ model nganHangLienKet {
   kPublic                  String                     @map("KPUBLIC") @db.VarChar(256)
   kPrivate                 String                     @map("KPRIVATE") @db.VarChar(256)
   kSecret                  String                     @map("KSECRET") @db.VarChar(256)
+  coCheBaoMat              CoCheBaoMat                @default(RSA)
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
 
   @@map("NGANHANGLIENKET")
@@ -127,4 +128,9 @@ enum vaitro {
   Admin
   User
   Banker
+}
+
+enum CoCheBaoMat {
+  RSA
+  PGP
 }
