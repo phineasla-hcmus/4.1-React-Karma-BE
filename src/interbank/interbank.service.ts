@@ -106,7 +106,7 @@ export class InterbankService {
           soTien: true,
         },
         where: {
-          soTien: { gt: 0 },
+          soTien: { lt: 0 },
         },
       });
       received = await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
@@ -115,7 +115,7 @@ export class InterbankService {
         },
         where: {
           soTien: {
-            lt: 0,
+            gt: 0,
           },
         },
       });
@@ -128,8 +128,8 @@ export class InterbankService {
         });
       }
     }
-    statistic.soTienGui = sent._sum.soTien;
-    statistic.soTienNhan = -received._sum.soTien;
+    statistic.soTienGui = -sent._sum.soTien;
+    statistic.soTienNhan = received._sum.soTien;
     return statistic;
   }
 }
