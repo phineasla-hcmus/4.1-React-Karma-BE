@@ -24,6 +24,15 @@ export class InterbankController {
     }
   }
 
+  @Get('statistic')
+  findStatistic() {
+    try {
+      return this.interbankService.findStatistic();
+    } catch (e) {
+      throw e;
+    }
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     try {

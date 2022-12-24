@@ -46,8 +46,9 @@ export class BankersService {
   async findAllWithoutPagination() {
     try {
       return await this.prismaService.taiKhoan.findMany({
-        include: {
-          nhanVien: true,
+        where: {
+          vaiTro: 'Banker',
+          hoatDong: true,
         },
       });
     } catch (e) {
@@ -64,7 +65,12 @@ export class BankersService {
   async findAllWithPagination(pagination: PaginationDto) {
     let total;
     try {
-      total = await this.prismaService.taiKhoan.count();
+      total = await this.prismaService.taiKhoan.count({
+        where: {
+          vaiTro: 'Banker',
+          hoatDong: true,
+        },
+      });
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -80,6 +86,10 @@ export class BankersService {
       bankerList = await this.prismaService.taiKhoan.findMany({
         skip: (pagination.page - 1) * pagination.size,
         take: pagination.size,
+        where: {
+          vaiTro: 'Banker',
+          hoatDong: true,
+        },
         include: {
           nhanVien: true,
         },
@@ -131,24 +141,13 @@ export class BankersService {
 
   //id: mã tài khoản
   async update(id: number, updateBankerDto: UpdateBankerDto) {
-    let banker;
     try {
-      banker = await this.prismaService.taiKhoan.update({
+      return await this.prismaService.nhanVien.update({
         data: {
-          nhanVien: {
-            updateMany: {
-              data: {
-                hoTen: updateBankerDto.hoTen,
-                sdt: updateBankerDto.sdt,
-              },
-              where: { maTK: id },
-            },
-          },
+          hoTen: updateBankerDto.hoTen,
+          sdt: updateBankerDto.sdt,
         },
         where: { maTK: id },
-        select: {
-          nhanVien: true,
-        },
       });
     } catch (e) {
       if (e instanceof Error) {
@@ -159,18 +158,36 @@ export class BankersService {
         });
       }
     }
-
-    if (!banker) {
-      throw new NotFoundException({
-        errorId: 'id_not_found',
-        message: 'Id not found',
-      });
-    }
-    return banker;
   }
 
-  //TODO: will implement after the table changes
-  remove(id: number) {
-    return `This action removes a #${id} banker`;
+  async remove(id: number) {
+    try {
+      await this.prismaService.$transaction([
+        this.prismaService.taiKhoan.updateMany({
+          data: {
+            hoatDong: false,
+          },
+          where: {
+            maTK: id,
+          },
+        }),
+        this.prismaService.taiKhoanThanhToan.updateMany({
+          data: {
+            hoatDong: false,
+          },
+          where: { maTK: id },
+        }),
+      ]);
+
+      return 'Delete successful';
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new InternalServerErrorException({
+          errorId: e.name,
+          message: e.message,
+          stack: e.stack,
+        });
+      }
+    }
   }
 }
