@@ -30,7 +30,8 @@ export class BankersController {
   @Get('all')
   async findAllWithoutPagination() {
     try {
-      return this.bankersService.findAllWithoutPagination();
+      const data = await this.bankersService.findAllWithoutPagination();
+      return { data };
     } catch (e) {
       throw e;
     }
@@ -39,7 +40,8 @@ export class BankersController {
   @Get()
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
-      return this.bankersService.findAllWithPagination(pagination);
+      const data = this.bankersService.findAllWithPagination(pagination);
+      return data;
     } catch (e) {
       throw e;
     }

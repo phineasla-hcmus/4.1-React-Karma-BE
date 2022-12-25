@@ -45,12 +45,20 @@ export class BankersService {
 
   async findAllWithoutPagination() {
     try {
-      return await this.prismaService.taiKhoan.findMany({
+      const data = await this.prismaService.taiKhoan.findMany({
         where: {
           vaiTro: 'Banker',
           hoatDong: true,
         },
+        include: {
+          nhanVien: true,
+        },
       });
+
+      return data.map(({ ...props }) => ({
+        ...props,
+        id: props.maTK,
+      }));
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -83,7 +91,7 @@ export class BankersService {
     }
     let bankerList;
     try {
-      bankerList = await this.prismaService.taiKhoan.findMany({
+      const data = await this.prismaService.taiKhoan.findMany({
         skip: (pagination.page - 1) * pagination.size,
         take: pagination.size,
         where: {
@@ -94,6 +102,11 @@ export class BankersService {
           nhanVien: true,
         },
       });
+
+      bankerList = data.map(({ ...props }) => ({
+        ...props,
+        id: props.maTK,
+      }));
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -112,7 +125,7 @@ export class BankersService {
   async findOne(id: number) {
     let banker;
     try {
-      banker = await this.prismaService.taiKhoan.findUnique({
+      const data = await this.prismaService.taiKhoan.findUnique({
         where: {
           maTK: id,
         },
@@ -120,6 +133,7 @@ export class BankersService {
           nhanVien: true,
         },
       });
+      banker = { id: data.maTK, ...data };
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -142,13 +156,15 @@ export class BankersService {
   //id: mã tài khoản
   async update(id: number, updateBankerDto: UpdateBankerDto) {
     try {
-      return await this.prismaService.nhanVien.update({
+      const data = await this.prismaService.nhanVien.update({
         data: {
           hoTen: updateBankerDto.hoTen,
           sdt: updateBankerDto.sdt,
         },
         where: { maTK: id },
       });
+
+      return { data, id: data.maTK };
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({

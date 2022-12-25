@@ -9,7 +9,8 @@ export class InterbankController {
   @Get('all')
   async findAllWithoutPagination() {
     try {
-      return this.interbankService.findAllWithoutPagination();
+      const data = await this.interbankService.findAllWithoutPagination();
+      return { data };
     } catch (e) {
       throw e;
     }

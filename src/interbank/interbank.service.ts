@@ -12,11 +12,15 @@ export class InterbankService {
 
   async findAllWithoutPagination() {
     try {
-      return await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
+      const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
         include: {
           nganHangLK: true,
         },
       });
+      return data.map(({ ...props }) => ({
+        ...props,
+        id: props.maCKN,
+      }));
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
