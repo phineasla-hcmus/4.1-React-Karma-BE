@@ -3,11 +3,8 @@ import { PaymentAccountsService } from 'src/paymentAccounts/paymentAccounts.serv
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class SupportService {
-  constructor(
-    private prismaService: PrismaService,
-    private paymentAccountService: PaymentAccountsService,
-  ) {}
+export class InterbankService {
+  constructor(private paymentAccountService: PaymentAccountsService) {}
 
   async getPaymentAccountInfo(account_no: string) {
     return await this.paymentAccountService.getInfoByAccountNo(account_no);

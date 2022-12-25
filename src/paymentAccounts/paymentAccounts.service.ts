@@ -19,8 +19,6 @@ export class PaymentAccountsService {
             khachHang: {
               select: {
                 hoTen: true,
-                sdt: true,
-                email: true,
               },
             },
           },
@@ -35,15 +33,12 @@ export class PaymentAccountsService {
     });
     const user = raw[0];
 
-    if (!user) {
-      throw new HttpException(
-        { errorId: HttpStatus.NOT_FOUND, message: 'User not found' },
-        HttpStatus.OK,
-      );
+    if (user) {
+      return {
+        soTK: user.soTK,
+        hoTen: user.taiKhoan.khachHang.hoTen,
+      };
     }
-    return {
-      soTK: user.soTK,
-      hoTen: user.taiKhoan.khachHang.hoTen,
-    };
+    return null;
   }
 }
