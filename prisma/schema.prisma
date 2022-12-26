@@ -60,8 +60,6 @@ model nganHangLienKet {
   maNH                     Int                        @id @default(autoincrement()) @map("MANH")
   tenNH                    String                     @map("TENNH") @db.VarChar(50)
   kPublic                  String                     @map("KPUBLIC") @db.VarChar(256)
-  kPrivate                 String                     @map("KPRIVATE") @db.VarChar(256)
-  kSecret                  String                     @map("KSECRET") @db.VarChar(256)
   coCheBaoMat              CoCheBaoMat                @default(RSA)
 
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
