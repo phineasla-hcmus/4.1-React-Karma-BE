@@ -106,7 +106,7 @@ model taiKhoan {
   nhanVien          nhanVien?
   taiKhoanThanhToan taiKhoanThanhToan?
   khachHang         khachHang?
-  hoatDong          Boolean            @default(true)
+  hoatDong          Boolean            @default(true) @map("HOATDONG")
 
   @@map("TAIKHOAN")
 }
@@ -115,7 +115,7 @@ model taiKhoanThanhToan {
   soTK                     String                     @id @map("SOTK") @db.VarChar(12)
   soDu                     Int                        @map("SODU")
   maTK                     Int?                       @unique @map("MATK")
-  hoatDong                 Boolean                    @default(true)
+  hoatDong                 Boolean                    @default(true) @map("HOATDONG")
   chuyenKhoan              chuyenKhoanNoiBo[]         @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN")
   duocChuyenKhoan          chuyenKhoanNoiBo[]         @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN")
   taiKhoan                 taiKhoan?                  @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_TAIKHOANTHANHTOAN_TAIKHOAN")
