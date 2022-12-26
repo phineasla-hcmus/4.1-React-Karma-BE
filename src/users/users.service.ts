@@ -28,9 +28,16 @@ export class UsersService {
               email: createUserDto.email,
             },
           },
+          taiKhoanThanhToan: {
+            create: {
+              soTK: createUserDto.soTK,
+              soDu: 0,
+            },
+          },
         },
         include: {
           khachHang: true,
+          taiKhoanThanhToan: true,
         },
       });
     } catch (e) {
