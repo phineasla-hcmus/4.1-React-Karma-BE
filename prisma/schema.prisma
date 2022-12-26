@@ -57,11 +57,11 @@ model chuyenKhoanNganHangNgoai {
 }
 
 model nganHangLienKet {
-  maNH                     Int                        @id @default(autoincrement()) @map("MANH")
-  tenNH                    String                     @map("TENNH") @db.VarChar(50)
-  kPublic                  String                     @map("KPUBLIC") @db.VarChar(256)
-  kPrivate                 String                     @map("KPRIVATE") @db.VarChar(256)
-  kSecret                  String                     @map("KSECRET") @db.VarChar(256)
+  maNH        Int         @id @default(autoincrement()) @map("MANH")
+  tenNH       String      @map("TENNH") @db.VarChar(50)
+  kPublic     String      @map("KPUBLIC") @db.VarChar(256)
+  coCheBaoMat CoCheBaoMat @default(RSA)
+
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
 
   @@map("NGANHANGLIENKET")
@@ -83,11 +83,12 @@ model nhacNo {
 }
 
 model nhanVien {
-  maNV     Int       @id @default(autoincrement()) @map("MANV")
-  hoTen    String    @map("HOTEN") @db.VarChar(30)
-  sdt      String    @map("SDT") @db.VarChar(15)
-  maTK     Int?      @unique @map("MATK")
-  taiKhoan taiKhoan? @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHANVIEN_TAIKHOAN")
+  maNV          Int             @id @default(autoincrement()) @map("MANV")
+  hoTen         String          @map("HOTEN") @db.VarChar(30)
+  sdt           String          @map("SDT") @db.VarChar(15)
+  maTK          Int?            @unique @map("MATK")
+  taiKhoan      taiKhoan?       @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHANVIEN_TAIKHOAN")
+  lichSuNapTien lichSuNapTien[]
 
   @@map("NHANVIEN")
 }
@@ -119,12 +120,30 @@ model taiKhoanThanhToan {
   duocChuyenKhoan          chuyenKhoanNoiBo[]         @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN")
   taiKhoan                 taiKhoan?                  @relation(fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_TAIKHOANTHANHTOAN_TAIKHOAN")
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
+  lichSuNapTien            lichSuNapTien[]
 
   @@map("TAIKHOANTHANHTOAN")
+}
+
+model lichSuNapTien {
+  maGG              Int                @id @default(autoincrement()) @map("MAGG")
+  maNV              Int                @map("MATKNHANVIEN")
+  soTK              String             @map("SOTK") @db.VarChar(12)
+  soTien            Int                @map("SOTIEN")
+  thoiGian          DateTime           @default(now()) @map("THOIGIAN")
+  nhanVien          nhanVien?          @relation(fields: [maNV], references: [maNV], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_NHANVIEN")
+  taiKhoanThanhToan taiKhoanThanhToan? @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_TAIKHOANTHANHTOAN")
+
+  @@map("LICHSUNAPTIEN")
 }
 
 enum vaitro {
   Admin
   User
   Banker
+}
+
+enum CoCheBaoMat {
+  RSA
+  PGP
 }

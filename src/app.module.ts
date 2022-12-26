@@ -3,9 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BankersModule } from './bankers/bankers.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
+import { BankersModule } from './bankers/bankers.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     BankersModule,
     InterbankModule,
+    PaymentAccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

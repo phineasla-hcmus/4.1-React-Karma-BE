@@ -1,12 +1,17 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-
+import { PaymentAccountsService } from 'src/paymentAccounts/paymentAccounts.service';
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class InterbankService {
-  constructor(private prismaService: PrismaService) {}
-
+  constructor(
+    private prismaService: PrismaService,
+    private paymentAccountService: PaymentAccountsService,
+  ) {}
+  async getPaymentAccountInfo(account_no: string) {
+    return await this.paymentAccountService.getInfoByAccountNo(account_no);
+  }
   async findAllWithoutPagination() {
     try {
       const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
