@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BankersModule } from './bankers/bankers.module';
 import { InterbankModule } from './interbank/interbank.module';
+import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
     InterbankModule,
     UsersModule,
     TransactionsModule,
+    PaymentAccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
