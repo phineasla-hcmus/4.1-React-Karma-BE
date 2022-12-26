@@ -8,7 +8,8 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
-import { Pagination, PaginationDto } from 'src/pagination';
+
+import { Pagination, PaginationDto } from '../pagination';
 
 import { BankersService } from './bankers.service';
 import { CreateBankerDto } from './dto/create-banker.dto';
@@ -40,7 +41,7 @@ export class BankersController {
   @Get()
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
-      const data = this.bankersService.findAllWithPagination(pagination);
+      const data = await this.bankersService.findAllWithPagination(pagination);
       return data;
     } catch (e) {
       throw e;

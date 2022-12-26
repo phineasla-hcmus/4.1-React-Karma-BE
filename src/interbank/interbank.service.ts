@@ -1,10 +1,7 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { formatResponse, PaginationDto } from 'src/pagination';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+
+import { formatResponse, PaginationDto } from '../pagination';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class InterbankService {
@@ -99,7 +96,7 @@ export class InterbankService {
   }
 
   async findStatistic() {
-    let statistic = {
+    const statistic = {
       soTienGui: 0,
       soTienNhan: 0,
     };

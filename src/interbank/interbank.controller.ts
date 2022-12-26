@@ -1,5 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { Pagination, PaginationDto } from 'src/pagination';
+
+import { Pagination, PaginationDto } from '../pagination';
+
 import { InterbankService } from './interbank.service';
 
 @Controller('interbank')

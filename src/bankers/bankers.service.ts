@@ -3,8 +3,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { formatResponse, PaginationDto } from 'src/pagination';
 
+import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateBankerDto } from './dto/create-banker.dto';
