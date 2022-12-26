@@ -130,7 +130,7 @@ model lichSuNapTien {
   maNV              Int                @map("MATKNHANVIEN")
   soTK              String             @map("SOTK") @db.VarChar(12)
   soTien            Int                @map("SOTIEN")
-  thoiGian          DateTime           @map("THOIGIAN")
+  thoiGian          DateTime           @default(now()) @map("THOIGIAN")
   nhanVien          nhanVien?          @relation(fields: [maNV], references: [maNV], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_NHANVIEN")
   taiKhoanThanhToan taiKhoanThanhToan? @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_TAIKHOANTHANHTOAN")
 
