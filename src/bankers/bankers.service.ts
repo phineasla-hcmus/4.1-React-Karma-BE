@@ -194,8 +194,6 @@ export class BankersService {
           where: { maTK: id },
         }),
       ]);
-
-      return 'Delete successful';
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({

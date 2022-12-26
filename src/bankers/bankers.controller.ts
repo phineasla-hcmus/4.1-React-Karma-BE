@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { Pagination, PaginationDto } from '../pagination';
@@ -66,7 +67,8 @@ export class BankersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bankersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.bankersService.remove(+id);
+    return { data: { status: HttpStatus.OK } };
   }
 }
