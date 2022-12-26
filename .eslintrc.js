@@ -11,6 +11,8 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
   ],
   root: true,
   env: {
@@ -31,6 +33,12 @@ module.exports = {
           caseInsensitive: false,
         },
         'newlines-between': 'always',
+      },
+    ],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
       },
     ],
   },
