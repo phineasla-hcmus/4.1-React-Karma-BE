@@ -11,7 +11,7 @@ export class PaymentAccountsService {
   constructor(private prismaService: PrismaService) {}
 
   public async getInfoByAccountNo(account_no: string) {
-    const raw = await this.prismaService.taiKhoanThanhToan.findMany({
+    const user = await this.prismaService.taiKhoanThanhToan.findFirst({
       select: {
         soTK: true,
         taiKhoan: {
@@ -31,7 +31,6 @@ export class PaymentAccountsService {
         },
       },
     });
-    const user = raw[0];
 
     if (user) {
       return {
