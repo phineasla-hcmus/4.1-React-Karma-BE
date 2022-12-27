@@ -209,42 +209,103 @@ export class BankersService {
 
   //id: mã nhân viên
   async recharge(id: number, rechangeDto: RechargeDto) {
-    const user = await this.prismaService.taiKhoanThanhToan.findUnique({
-      where: {
-        soTK: rechangeDto.soTK,
-      },
-    });
-    if (!user) {
-      throw new NotFoundException();
-    }
-    try {
-      await this.prismaService.$transaction([
-        this.prismaService.lichSuNapTien.create({
-          data: {
-            maNV: id,
-            soTK: rechangeDto.soTK,
-            soTien: rechangeDto.soTienThem,
-          },
-        }),
-        this.prismaService.taiKhoanThanhToan.update({
-          data: {
-            soDu: user.soDu + rechangeDto.soTienThem,
-          },
-          where: {
-            soTK: rechangeDto.soTK,
-          },
-        }),
-      ]);
-
-      return { data: { status: HttpStatus.OK } };
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new InternalServerErrorException({
-          errorId: e.name,
-          message: e.message,
-          stack: e.stack,
-        });
+    // dùng số tài khoản
+    if (rechangeDto.soTK) {
+      const user = await this.prismaService.taiKhoanThanhToan.findUnique({
+        where: {
+          soTK: rechangeDto.soTK,
+        },
+      });
+      if (!user) {
+        throw new NotFoundException();
       }
+      try {
+        await this.prismaService.$transaction([
+          this.prismaService.lichSuNapTien.create({
+            data: {
+              maNV: id,
+              soTK: rechangeDto.soTK,
+              soTien: rechangeDto.soTienThem,
+            },
+          }),
+          this.prismaService.taiKhoanThanhToan.update({
+            data: {
+              soDu: user.soDu + rechangeDto.soTienThem,
+            },
+            where: {
+              soTK: rechangeDto.soTK,
+            },
+          }),
+        ]);
+
+        return { data: { status: HttpStatus.OK } };
+      } catch (e) {
+        if (e instanceof Error) {
+          throw new InternalServerErrorException({
+            errorId: e.name,
+            message: e.message,
+            stack: e.stack,
+          });
+        }
+      }
+    }
+
+    // dùng tên đăng nhập (username)
+    else if (rechangeDto.tenDangNhap) {
+      let bankAccountUser: any;
+      // use username to find an account in "taiKhoan"
+      const accountUser = await this.prismaService.taiKhoan.findUnique({
+        where: {
+          tenDangNhap: rechangeDto.tenDangNhap,
+        },
+      });
+
+      // use id from account in "taiKhoan" to find a suitable account in "taiKhoanThanhToan"
+      if (accountUser) {
+        bankAccountUser = await this.prismaService.taiKhoanThanhToan.findUnique(
+          {
+            where: {
+              maTK: accountUser.maTK,
+            },
+          },
+        );
+      }
+
+      if (!bankAccountUser) {
+        throw NotFoundException;
+      }
+
+      try {
+        await this.prismaService.$transaction([
+          this.prismaService.lichSuNapTien.create({
+            data: {
+              maNV: id,
+              soTK: bankAccountUser.soTK,
+              soTien: rechangeDto.soTienThem,
+            },
+          }),
+          this.prismaService.taiKhoanThanhToan.update({
+            data: {
+              soDu: bankAccountUser.soDu + rechangeDto.soTienThem,
+            },
+            where: {
+              soTK: bankAccountUser.soTK,
+            },
+          }),
+        ]);
+
+        return { data: { status: HttpStatus.OK } };
+      } catch (e) {
+        if (e instanceof Error) {
+          throw new InternalServerErrorException({
+            errorId: e.name,
+            message: e.message,
+            stack: e.stack,
+          });
+        }
+      }
+    } else {
+      throw new NotFoundException();
     }
   }
 }
