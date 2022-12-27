@@ -1,9 +1,11 @@
 import {
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
+import { RechargeDto } from '../bankers/dto/recharge.dto';
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -194,6 +196,47 @@ export class BankersService {
           where: { maTK: id },
         }),
       ]);
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new InternalServerErrorException({
+          errorId: e.name,
+          message: e.message,
+          stack: e.stack,
+        });
+      }
+    }
+  }
+
+  //id: mã nhân viên
+  async recharge(id: number, rechangeDto: RechargeDto) {
+    const user = await this.prismaService.taiKhoanThanhToan.findUnique({
+      where: {
+        soTK: rechangeDto.soTK,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    try {
+      await this.prismaService.$transaction([
+        this.prismaService.lichSuNapTien.create({
+          data: {
+            maNV: id,
+            soTK: rechangeDto.soTK,
+            soTien: rechangeDto.soTienThem,
+          },
+        }),
+        this.prismaService.taiKhoanThanhToan.update({
+          data: {
+            soDu: user.soDu + rechangeDto.soTienThem,
+          },
+          where: {
+            soTK: rechangeDto.soTK,
+          },
+        }),
+      ]);
+
+      return { data: { status: HttpStatus.OK } };
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({

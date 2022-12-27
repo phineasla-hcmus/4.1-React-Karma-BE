@@ -10,6 +10,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
+import { RechargeDto } from '../bankers/dto/recharge.dto';
 import { Pagination, PaginationDto } from '../pagination';
 
 import { BankersService } from './bankers.service';
@@ -70,5 +71,13 @@ export class BankersController {
   async remove(@Param('id') id: string) {
     await this.bankersService.remove(+id);
     return { data: { status: HttpStatus.OK } };
+  }
+
+  @Patch(':id/recharge')
+  recharge(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() rechargeDto: RechargeDto,
+  ) {
+    return this.bankersService.recharge(id, rechargeDto);
   }
 }
