@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { PaymentAccountsService } from 'src/paymentAccounts/paymentAccounts.service';
+
 import { formatResponse, PaginationDto } from '../pagination';
+import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -50,14 +51,17 @@ export class InterbankService {
     }
     let interbankList;
     try {
-      interbankList =
-        await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
-          skip: (pagination.page - 1) * pagination.size,
-          take: pagination.size,
-          include: {
-            nganHangLK: true,
-          },
-        });
+      const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
+        skip: (pagination.page - 1) * pagination.size,
+        take: pagination.size,
+        include: {
+          nganHangLK: true,
+        },
+      });
+      interbankList = data.map(({ ...props }) => ({
+        ...props,
+        id: props.maCKN,
+      }));
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({

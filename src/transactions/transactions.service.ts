@@ -41,10 +41,15 @@ export class TransactionsService {
     }
     let transactionList;
     try {
-      transactionList = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      const data = await this.prismaService.chuyenKhoanNoiBo.findMany({
         skip: (pagination.page - 1) * pagination.size,
         take: pagination.size,
       });
+
+      transactionList = data.map(({ ...props }) => ({
+        ...props,
+        id: props.maCK,
+      }));
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
