@@ -127,7 +127,7 @@ model taiKhoanThanhToan {
 
 model lichSuNapTien {
   maGG              Int                @id @default(autoincrement()) @map("MAGG")
-  maNV              Int                @map("MATKNHANVIEN")
+  maNV              Int                @map("MANHANVIEN")
   soTK              String             @map("SOTK") @db.VarChar(12)
   soTien            Int                @map("SOTIEN")
   thoiGian          DateTime           @default(now()) @map("THOIGIAN")

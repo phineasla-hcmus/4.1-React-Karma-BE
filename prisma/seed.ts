@@ -14,7 +14,7 @@ async function main() {
     let banker = await prisma.nhanVien.create({
       data: {
         hoTen: fullName,
-        sdt: faker.phone.number('09##-###-###'),
+        sdt: faker.phone.number('09########'),
         taiKhoan: {
           create: {
             tenDangNhap: username,
@@ -44,7 +44,7 @@ async function main() {
     let user = await prisma.khachHang.create({
       data: {
         hoTen: fullName,
-        sdt: faker.phone.number('09##-###-###'),
+        sdt: faker.phone.number('09########'),
         email: faker.internet.email(firsName, lastName, 'gmail'),
         taiKhoan: {
           create: {
@@ -59,7 +59,7 @@ async function main() {
     // taikhoanthanhtoan cho user
     let tkthanhtoan = await prisma.taiKhoanThanhToan.create({
       data: {
-        soTK: faker.finance.creditCardNumber('### ### ####'),
+        soTK: faker.finance.creditCardNumber('##########'),
         soDu: +faker.finance.account(8),
         maTK: user.maTK,
       },
