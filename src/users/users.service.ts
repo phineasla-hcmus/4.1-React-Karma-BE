@@ -107,7 +107,7 @@ export class UsersService {
           hoatDong: true,
         },
         include: {
-          nhanVien: true,
+          khachHang: true,
         },
       });
 
