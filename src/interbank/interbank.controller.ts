@@ -15,7 +15,7 @@ import { InterbankService } from './interbank.service';
 @Controller('interbank')
 export class InterbankController {
   constructor(private interbankService: InterbankService) {}
-  @Get()
+  @Get('account')
   async getAccount(@Query('account_no') account_no: string) {
     if (account_no) {
       const user = await this.interbankService.getPaymentAccountInfo(
