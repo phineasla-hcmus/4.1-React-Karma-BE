@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 async function main() {
@@ -7,11 +7,11 @@ async function main() {
 
   //2 Bankers
   for (let i = 1; i < 3; i++) {
-    let firsName = faker.name.firstName();
-    let lastName = faker.name.lastName();
-    let fullName = firsName + ' ' + lastName;
-    let username = faker.random.numeric(12);
-    let banker = await prisma.nhanVien.create({
+    const firsName = faker.name.firstName();
+    const lastName = faker.name.lastName();
+    const fullName = firsName + ' ' + lastName;
+    const username = faker.random.numeric(12);
+    const banker = await prisma.nhanVien.create({
       data: {
         hoTen: fullName,
         sdt: faker.phone.number('09########'),
@@ -26,7 +26,7 @@ async function main() {
     });
   }
   //1 Admin
-  let admin = await prisma.taiKhoan.create({
+  const admin = await prisma.taiKhoan.create({
     data: {
       tenDangNhap: faker.random.numeric(12),
       matKhau: hashed,
@@ -36,12 +36,12 @@ async function main() {
 
   // 5 user
   for (let i = 1; i < 6; i++) {
-    let firsName = faker.name.firstName();
-    let lastName = faker.name.lastName();
-    let fullName = firsName + ' ' + lastName;
-    let username = faker.random.numeric(12);
+    const firsName = faker.name.firstName();
+    const lastName = faker.name.lastName();
+    const fullName = firsName + ' ' + lastName;
+    const username = faker.random.numeric(12);
 
-    let user = await prisma.khachHang.create({
+    const user = await prisma.khachHang.create({
       data: {
         hoTen: fullName,
         sdt: faker.phone.number('09########'),
@@ -57,7 +57,7 @@ async function main() {
     });
 
     // taikhoanthanhtoan cho user
-    let tkthanhtoan = await prisma.taiKhoanThanhToan.create({
+    const tkthanhtoan = await prisma.taiKhoanThanhToan.create({
       data: {
         soTK: faker.finance.creditCardNumber('##########'),
         soDu: +faker.finance.account(8),
@@ -66,7 +66,7 @@ async function main() {
     });
   }
   //lay danhsach user hien tai
-  let list = await prisma.taiKhoan.findMany({
+  const list = await prisma.taiKhoan.findMany({
     where: {
       vaiTro: 'User',
     },
@@ -75,7 +75,7 @@ async function main() {
     },
     include: { taiKhoanThanhToan: true },
   });
-  let n = list.length;
+  const n = list.length;
 
   //danhsachdaluu
   for (let i = 0; i < n - 1; i++) {
@@ -94,7 +94,7 @@ async function main() {
     let count = 0;
     // chuyen khoan
     while (count < 8) {
-      let rand = faker.datatype.number({
+      const rand = faker.datatype.number({
         min: 0,
         max: n - 1,
       });
@@ -113,7 +113,7 @@ async function main() {
     //duoc chuyen khoan
     count = 0;
     while (count < 8) {
-      let rand = faker.datatype.number({
+      const rand = faker.datatype.number({
         min: 0,
         max: n - 1,
       });
