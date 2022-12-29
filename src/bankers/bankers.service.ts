@@ -22,7 +22,7 @@ export class BankersService {
     const tenDangNhap = faker.random.numeric(8);
     const matKhau = bcrypt.hashSync(tenDangNhap, 10);
     try {
-      return await this.prismaService.taiKhoan.create({
+      const data = await this.prismaService.taiKhoan.create({
         data: {
           tenDangNhap,
           matKhau,
@@ -38,6 +38,10 @@ export class BankersService {
           nhanVien: true,
         },
       });
+      return {
+        ...data,
+        id: data.maTK,
+      };
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({

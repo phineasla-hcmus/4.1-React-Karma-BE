@@ -1,8 +1,10 @@
+import { faker } from '@faker-js/faker';
 import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,11 +17,14 @@ export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    const tenDangNhap = faker.random.numeric(8);
+    const matKhau = bcrypt.hashSync(tenDangNhap, 10);
+    const soTK = tenDangNhap;
     try {
       return await this.prismaService.taiKhoan.create({
         data: {
-          tenDangNhap: createUserDto.tenDangNhap,
-          matKhau: createUserDto.matKhau,
+          tenDangNhap,
+          matKhau,
           vaiTro: 'User',
           khachHang: {
             create: {
@@ -30,7 +35,7 @@ export class UsersService {
           },
           taiKhoanThanhToan: {
             create: {
-              soTK: createUserDto.soTK,
+              soTK,
               soDu: 0,
             },
           },
