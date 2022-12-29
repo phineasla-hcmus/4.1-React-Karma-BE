@@ -1,9 +1,11 @@
+import { faker } from '@faker-js/faker';
 import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
 import { formatResponse, PaginationDto } from '../pagination';
@@ -17,11 +19,13 @@ export class BankersService {
   constructor(private prismaService: PrismaService) {}
 
   async create(createBankerDto: CreateBankerDto) {
+    const tenDangNhap = faker.random.numeric(8);
+    const matKhau = bcrypt.hashSync(tenDangNhap, 10);
     try {
       return await this.prismaService.taiKhoan.create({
         data: {
-          tenDangNhap: createBankerDto.tenDangNhap,
-          matKhau: createBankerDto.matKhau,
+          tenDangNhap,
+          matKhau,
           vaiTro: 'Banker',
           nhanVien: {
             create: {
