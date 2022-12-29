@@ -21,7 +21,7 @@ export class UsersService {
     const matKhau = bcrypt.hashSync(tenDangNhap, 10);
     const soTK = tenDangNhap;
     try {
-      return await this.prismaService.taiKhoan.create({
+      const data = await this.prismaService.taiKhoan.create({
         data: {
           tenDangNhap,
           matKhau,
@@ -45,6 +45,7 @@ export class UsersService {
           taiKhoanThanhToan: true,
         },
       });
+      return { ...data, id: data.maTK };
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
