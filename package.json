@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.7.1",
     "@types/bcrypt": "^5.0.0",
+    "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "prisma": "^4.7.1",

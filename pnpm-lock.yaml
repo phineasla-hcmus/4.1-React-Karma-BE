@@ -20,6 +20,7 @@ specifiers:
   '@types/validator': ^13.7.10
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
+  axios: ^1.2.2
   bcrypt: ^5.1.0
   dotenv: ^16.0.3
   eslint: ^8.29.0
@@ -53,6 +54,7 @@ dependencies:
   '@nestjs/platform-express': 9.2.1_hjcqpoaebdr7gdo5hgc22hthbe
   '@prisma/client': 4.7.1_prisma@4.7.1
   '@types/bcrypt': 5.0.0
+  axios: 1.2.2
   bcrypt: 5.1.0
   dotenv: 16.0.3
   prisma: 4.7.1
@@ -1807,6 +1809,16 @@ packages:
 
   /axios/1.2.1:
     resolution: {integrity: sha512-I88cFiGu9ryt/tfVEi4kX2SITsvDddTajXTOFmt2uK1ZVA8LytjtdeyefdQWEf5PU8w+4SSJDoYnggflB5tW4A==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios/1.2.2:
+    resolution: {integrity: sha512-bz/J4gS2S3I7mpN/YZfGFTqhXTYzRho8Ay38w2otuuDR322KzFIWm/4W2K6gIwvWaws5n+mnb7D1lN9uD+QH6Q==}
     dependencies:
       follow-redirects: 1.15.2
       form-data: 4.0.0

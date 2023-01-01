@@ -14,7 +14,7 @@ export class HcmusbankService {
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {
-    this.baseUrl = 'https://hcmus-internet-banking-backend.vercel.app';
+    this.baseUrl = 'http://localhost:3000';
   }
 
   private async sign(payload: string) {
