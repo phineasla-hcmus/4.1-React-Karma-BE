@@ -1,10 +1,12 @@
-import { publicEncrypt } from 'crypto';
+import { createSign, publicEncrypt } from 'crypto';
 import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { catchError, firstValueFrom } from 'rxjs';
+import { isAxiosError } from 'axios';
+
+import { AxiosService } from '../axios/axios.service';
 
 @Injectable()
 export class HcmusbankService {
@@ -12,26 +14,45 @@ export class HcmusbankService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly httpService: HttpService,
+    private readonly axiosService: AxiosService,
   ) {
     this.baseUrl = 'http://localhost:3000';
   }
 
-  private async sign(payload: string) {
-    const publicKey = await readFile('hcmusbank.public.pem');
-    const encrypted = publicEncrypt(
-      { key: publicKey, oaepHash: 'SHA256' },
-      Buffer.from(payload),
-    );
-    return encrypted.toString('base64');
+  private transformPayload(payload: any) {
+    const json = JSON.stringify(payload);
+    const buffer = Buffer.from(json);
+    return buffer.toString('base64');
+  }
+
+  private async sign(transformedPayload: string) {
+    const privateKey = await readFile(join(__dirname, 'hcmusbank.private.pem'));
+    const sign = createSign('RSA-SHA256');
+    sign.update(transformedPayload);
+    sign.end();
+    return sign.sign(privateKey, 'base64');
   }
 
   public async findOneAccount(id: string) {
-    const payload = JSON.stringify({ accountNumber: '1234567890' });
-    const res = await firstValueFrom(
-      this.httpService.post(`${this.baseUrl}/api/external/query-bank-number`, {
-        payload,
-      }),
-    );
+    const payload = { accountNumber: id };
+    const data = this.transformPayload(payload);
+    const signature = await this.sign(data);
+    try {
+      const res = await this.axiosService.post(
+        `${this.baseUrl}/api/external/query-bank-number`,
+        {
+          data,
+          signature,
+        },
+      );
+      return res.data;
+    } catch (e) {
+      if (isAxiosError(e)) {
+        throw new HttpException(
+          { errorId: e.code, message: e.message },
+          e.status,
+        );
+      }
+    }
   }
 }
