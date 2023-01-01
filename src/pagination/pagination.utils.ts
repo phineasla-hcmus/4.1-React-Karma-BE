@@ -7,37 +7,26 @@ export const formatResponse = (
   data: any,
   resource: string,
 ) => {
-  if (pagination.page < lastPage) {
-    return {
-      page: pagination.page,
-      total,
-      size: pagination.size,
-      links: {
-        self: {
-          href: `${process.env.DOMAIN}/v1/${resource}?page=${pagination.page}&size=${pagination.size}`,
-        },
-        next: {
-          href: `${process.env.DOMAIN}/v1/${resource}?page=${
-            pagination.page + 1
-          }&size=${pagination.size}`,
-        },
-        last: {
-          href: `${process.env.DOMAIN}/v1/${resource}?page=${lastPage}&size=${pagination.size}`,
-        },
-      },
-      data,
-    };
-  }
+  const baseUrl = process.env.BASE_URL;
+  const next =
+    pagination.page < lastPage
+      ? {
+          href: `${baseUrl}/v1/${resource}?page=${pagination.page + 1}&size=${
+            pagination.size
+          }`,
+        }
+      : undefined;
   return {
     page: pagination.page,
     total,
     size: pagination.size,
     links: {
       self: {
-        href: `${process.env.DOMAIN}/v1/${resource}?page=${pagination.page}&size=${pagination.size}`,
+        href: `${baseUrl}/v1/${resource}?page=${pagination.page}&size=${pagination.size}`,
       },
+      next,
       last: {
-        href: `${process.env.DOMAIN}/v1/${resource}?page=${lastPage}&size=${pagination.size}`,
+        href: `${baseUrl}/v1/${resource}?page=${lastPage}&size=${pagination.size}`,
       },
     },
     data,
