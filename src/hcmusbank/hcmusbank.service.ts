@@ -1,4 +1,4 @@
-import { createSign, publicEncrypt } from 'crypto';
+import { createSign } from 'crypto';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
