@@ -31,6 +31,17 @@ model danhSachDaLuu {
   @@map("DANHSACHDALUU")
 }
 
+model danhSachNgoaiDaLuu {
+  maTK            Int             @map("MATK")
+  nguoiDung       Int             @map("NGUOIDUNG")
+  tenGoiNho       String          @map("TENGOINHO") @db.VarChar(20)
+  maNH            Int             @map("MANH")
+  nganHangLienKet nganHangLienKet @relation("DANHSACHNGOAIDALUU_MANHToNGANHANGLIENKET", fields: [maNH], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHNGOAIDALUU_NGANHANGLIENKET")
+
+  @@id([maTK, maNH])
+  @@map("DANHSACHNGOAIDALUU")
+}
+
 model khachHang {
   maKH     Int       @id @default(autoincrement()) @map("MAKH")
   hoTen    String    @map("HOTEN") @db.VarChar(30)
@@ -63,6 +74,7 @@ model nganHangLienKet {
   coCheBaoMat CoCheBaoMat @default(RSA)
 
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
+  danhSachNgoaiDaLuu       danhSachNgoaiDaLuu[]       @relation("DANHSACHNGOAIDALUU_MANHToNGANHANGLIENKET")
 
   @@map("NGANHANGLIENKET")
 }
