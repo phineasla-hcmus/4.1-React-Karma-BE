@@ -12,7 +12,9 @@ import { isAxiosError } from 'axios';
 
 import { AxiosService } from '../axios/axios.service';
 
-import { FindOneAccountDto } from './hcmusbank.types';
+import { FindOneAccountResponseDto } from './dto/find-one-account-response.dto';
+import { FindOneAccountDto } from './dto/find-one-account.dto';
+import { TransferDto } from './dto/transfer.dto';
 
 @Injectable()
 export class HcmusbankService {
@@ -52,13 +54,36 @@ export class HcmusbankService {
     });
   }
 
-  public async findOneAccount(id: string) {
+  public async findOneAccount({ id }: FindOneAccountDto) {
     const payload = { accountNumber: id };
     const data = this.transformPayload(payload);
     const signature = await this.sign(data);
     try {
-      const res = await this.axiosService.post<FindOneAccountDto>(
+      const res = await this.axiosService.post<FindOneAccountResponseDto>(
         `${this.baseUrl}/api/external/query-bank-number`,
+        {
+          data,
+          signature,
+        },
+      );
+      return res.data;
+    } catch (e) {
+      this.handleError(e);
+    }
+  }
+
+  public async transfer(transferDto: TransferDto) {
+    const payload = Object.assign({}, transferDto);
+    // As defined by HCMUSBank's API
+    // https://github.com/hcmus-internet-banking/backend/blob/a2a1ebf3c9490e403cde93965927c0d8903d5c27/src/pages/api/external/deposit.ts#L19
+    if (payload.payer !== 'receiver') {
+      payload.payer = undefined;
+    }
+    const data = this.transformPayload(payload);
+    const signature = await this.sign(data);
+    try {
+      const res = await this.axiosService.post<FindOneAccountResponseDto>(
+        `${this.baseUrl}/api/external/deposit`,
         {
           data,
           signature,
