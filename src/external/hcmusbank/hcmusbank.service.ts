@@ -3,14 +3,14 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 
 import {
-  HttpException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isAxiosError } from 'axios';
 
-import { AxiosService } from '../axios/axios.service';
+import { AxiosService } from '../../axios/axios.service';
 
 import { FindOneAccountResponseDto } from './dto/find-one-account-response.dto';
 import { FindOneAccountDto } from './dto/find-one-account.dto';
@@ -23,6 +23,7 @@ export class HcmusbankService {
   constructor(
     private readonly configService: ConfigService,
     private readonly axiosService: AxiosService,
+    private readonly logger: Logger = new Logger('HcmusbankService'),
   ) {
     this.baseUrl = configService.getOrThrow('HCMUSBANK_BASE_URL');
   }
@@ -43,14 +44,26 @@ export class HcmusbankService {
 
   private handleError(e: unknown) {
     if (isAxiosError(e)) {
-      throw new HttpException(
-        { errorId: e.code, message: e.message },
-        e.status,
-      );
+      this.logger.error(e.toJSON());
+      if (e.status < 500) {
+        throw new InternalServerErrorException({
+          errorId: 'bad_transaction',
+          message: 'Something went wrong when connecting to HCMUSBank',
+        });
+      }
+      throw new InternalServerErrorException({
+        errorId: 'bad_interbank',
+        message: 'HCMUSBank went rogue',
+      });
+    }
+    if (e instanceof Error) {
+      this.logger.error(e.message, e.stack);
+    } else {
+      this.logger.error(e);
     }
     throw new InternalServerErrorException({
       errorId: 'i_dont_know',
-      message: e instanceof Error ? e.message : 'Good luck debuging this',
+      message: 'Good luck debuging this',
     });
   }
 
