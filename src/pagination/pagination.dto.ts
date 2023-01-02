@@ -1,4 +1,4 @@
-import { DEFAULT_PAGINATION_PAGE, DEFAULT_PAGINATION_SIZE } from './constants';
+import { DEFAULT_PAGINATION_PAGE, DEFAULT_PAGINATION_SIZE } from '../constants';
 
 export class PaginationDto {
   page: number = DEFAULT_PAGINATION_PAGE;

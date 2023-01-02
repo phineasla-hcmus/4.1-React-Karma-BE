@@ -1,12 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-import { AXIOS_INSTANCE_TOKEN } from './axios.constants';
-
 @Injectable()
 export class AxiosService {
   constructor(
-    @Inject(AXIOS_INSTANCE_TOKEN) protected readonly instance: AxiosInstance,
+    @Inject('AXIOS_INSTANCE_TOKEN') protected readonly instance: AxiosInstance,
   ) {}
 
   request<T = any>(config: AxiosRequestConfig) {
