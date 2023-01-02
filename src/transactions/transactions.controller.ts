@@ -1,8 +1,9 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 
 import { Pagination, PaginationDto } from '../pagination';
 
 import { TransactionsService } from './transactions.service';
+import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -19,9 +20,14 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAllWithPagination(@Pagination() pagination: PaginationDto) {
+  async findAllWithPagination(
+    @Pagination() pagination: PaginationDto,
+    @Query() query: TransactionQueryDTO,
+  ) {
+    console.log(query);
+
     try {
-      return this.transactionsService.findAllWithPagination(pagination);
+      return this.transactionsService.findAllWithPagination(pagination, query);
     } catch (e) {
       throw e;
     }

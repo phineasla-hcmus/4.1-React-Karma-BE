@@ -10,7 +10,7 @@ async function main() {
     const firsName = faker.name.firstName();
     const lastName = faker.name.lastName();
     const fullName = firsName + ' ' + lastName;
-    const username = faker.random.numeric(12);
+    const username = faker.random.numeric(8);
     const banker = await prisma.nhanVien.create({
       data: {
         hoTen: fullName,
@@ -28,7 +28,7 @@ async function main() {
   //1 Admin
   const admin = await prisma.taiKhoan.create({
     data: {
-      tenDangNhap: faker.random.numeric(12),
+      tenDangNhap: faker.random.numeric(8),
       matKhau: hashed,
       vaiTro: 'Admin',
     },
@@ -39,7 +39,7 @@ async function main() {
     const firsName = faker.name.firstName();
     const lastName = faker.name.lastName();
     const fullName = firsName + ' ' + lastName;
-    const username = faker.random.numeric(12);
+    const username = faker.random.numeric(8);
 
     const user = await prisma.khachHang.create({
       data: {
