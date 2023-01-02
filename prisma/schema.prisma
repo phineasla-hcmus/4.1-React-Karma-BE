@@ -71,7 +71,7 @@ model otpChuyenKhoan {
   soTK      String   @id @map("SOTK") @db.VarChar(12)
   nguoiNhan String   @map("NGUOINHAN") @db.VarChar(20)
   soTien    Int      @map("SOTIEN")
-  otp       String   @map("OTP") @db.Char(6)
+  otp       Int   @map("OTP")
   ngayTao   DateTime @default(now()) @map("NGAYTAO") @db.Date
 
   @@map("OTPCHUYENKHOAN")

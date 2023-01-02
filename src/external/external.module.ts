@@ -1,7 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
+import { AxiosModule } from 'src/axios/axios.module';
 
 import { HcmusbankModule } from './hcmusbank/hcmusbank.module';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
 
-@Module({ imports: [HcmusbankModule], exports: [HcmusbankService] })
+@Module({
+  providers: [HcmusbankService],
+  imports: [AxiosModule, HcmusbankModule],
+  exports: [HcmusbankService],
+})
 export class ExternalModule {}

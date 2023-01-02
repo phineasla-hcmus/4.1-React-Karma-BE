@@ -18,12 +18,12 @@ import { TransferDto } from './dto/transfer.dto';
 
 @Injectable()
 export class HcmusbankService {
+  private readonly logger: Logger = new Logger(HcmusbankService.name);
   baseUrl: string;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly axiosService: AxiosService,
-    private readonly logger: Logger = new Logger('HcmusbankService'),
   ) {
     this.baseUrl = configService.getOrThrow('HCMUSBANK_BASE_URL');
   }
