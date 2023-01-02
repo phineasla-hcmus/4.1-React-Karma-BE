@@ -33,7 +33,7 @@ model danhSachDaLuu {
 
 model danhSachNgoaiDaLuu {
   maTK            Int             @map("MATK")
-  nguoiDung       Int             @map("NGUOIDUNG")
+  nguoiDung       String          @map("NGUOIDUNG") @db.VarChar(20)
   tenGoiNho       String          @map("TENGOINHO") @db.VarChar(20)
   maNH            Int             @map("MANH")
   nganHangLienKet nganHangLienKet @relation("DANHSACHNGOAIDALUU_MANHToNGANHANGLIENKET", fields: [maNH], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHNGOAIDALUU_NGANHANGLIENKET")
@@ -65,6 +65,13 @@ model chuyenKhoanNganHangNgoai {
   taiKhoan   taiKhoanThanhToan @relation(fields: [tkTrong], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
 
   @@map("CHUYENKHOANNGANHANGNGOAI")
+}
+
+model otpChuyenKhoan {
+  soTK      String @id @map("SOTK") @db.VarChar(12)
+  nguoiNhan String @map("NGUOINHAN") @db.VarChar(20)
+  soTien    Int    @map("SOTIEN")
+  otp       String @map("OTP") @db.Char(6)
 }
 
 model nganHangLienKet {

@@ -1,7 +1,8 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 
 import { Pagination, PaginationDto } from '../pagination';
 
+import { RequestTransactionDto } from './dto/request-transaction.dto';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -35,4 +36,11 @@ export class TransactionsController {
       throw e;
     }
   }
+
+  @Post('request')
+  async requestTransaction({
+    soTK,
+    nguoiNhan,
+    soTien,
+  }: RequestTransactionDto) {}
 }
