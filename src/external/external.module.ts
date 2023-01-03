@@ -1,5 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
-import { AxiosModule } from 'src/axios/axios.module';
+
+import { AxiosModule } from '../axios/axios.module';
 
 import { HcmusbankModule } from './hcmusbank/hcmusbank.module';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
