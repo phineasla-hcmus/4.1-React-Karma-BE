@@ -1,4 +1,12 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime';
 
 import { formatResponse, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
@@ -6,13 +14,28 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class InterbankService {
+  private readonly logger: Logger = new Logger(InterbankService.name);
+
   constructor(
     private prismaService: PrismaService,
     private paymentAccountService: PaymentAccountsService,
   ) {}
-  async getPaymentAccountInfo(account_no: string) {
-    return await this.paymentAccountService.getInfoByAccountNo(account_no);
+
+  private handleError(e: unknown) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      this.logger.error(`${e.code}: ${e.message}`, e.stack);
+    } else if (e instanceof PrismaClientUnknownRequestError) {
+      this.logger.error(e.message, e.stack);
+    } else {
+      this.logger.error(e);
+    }
+    throw e;
   }
+
+  async getPaymentAccountInfo(soTK: string) {
+    return await this.paymentAccountService.getInfoByAccountNo(soTK);
+  }
+
   async findAllWithoutPagination() {
     try {
       const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
@@ -82,7 +105,9 @@ export class InterbankService {
     );
   }
 
-  //id: mã chuyển khoản
+  /**
+   * @param id maCKN
+   */
   async findOne(id: number) {
     try {
       return await this.prismaService.chuyenKhoanNganHangNgoai.findUnique({
@@ -105,41 +130,30 @@ export class InterbankService {
   }
 
   async findStatistic() {
-    const statistic = {
-      soTienGui: 0,
-      soTienNhan: 0,
-    };
-    let sent, received;
     try {
-      sent = await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-        _sum: {
-          soTien: true,
-        },
-        where: {
-          soTien: { lt: 0 },
-        },
-      });
-      received = await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-        _sum: {
-          soTien: true,
-        },
-        where: {
-          soTien: {
-            gt: 0,
+      const [sent, received] = await Promise.all([
+        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
+          _sum: {
+            soTien: true,
           },
-        },
-      });
+          where: {
+            soTien: { lt: 0 },
+          },
+        }),
+        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
+          _sum: {
+            soTien: true,
+          },
+          where: {
+            soTien: {
+              gt: 0,
+            },
+          },
+        }),
+      ]);
+      return { soTienGui: -sent._sum.soTien, soTienNhan: received._sum.soTien };
     } catch (e) {
-      if (e instanceof Error) {
-        throw new InternalServerErrorException({
-          errorId: e.name,
-          message: e.message,
-          stack: e.stack,
-        });
-      }
+      this.handleError(e);
     }
-    statistic.soTienGui = -sent._sum.soTien;
-    statistic.soTienNhan = received._sum.soTien;
-    return statistic;
   }
 }

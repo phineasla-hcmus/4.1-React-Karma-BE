@@ -2,8 +2,14 @@ import { faker } from '@faker-js/faker';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
 
 import { formatResponse, PaginationDto } from '../pagination';
@@ -14,7 +20,20 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger: Logger = new Logger(UsersService.name);
+
   constructor(private prismaService: PrismaService) {}
+
+  private handleError(e: unknown) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      this.logger.error(`${e.code}: ${e.message}`, e.stack);
+    } else if (e instanceof PrismaClientUnknownRequestError) {
+      this.logger.error(e.message, e.stack);
+    } else {
+      this.logger.error(e);
+    }
+    throw e;
+  }
 
   async create(createUserDto: CreateUserDto) {
     const tenDangNhap = faker.random.numeric(8);
@@ -135,7 +154,10 @@ export class UsersService {
     return formatResponse(pagination, total, lastPage, userList, 'users');
   }
 
-  //id: mã tài khoản
+  /**
+   *
+   * @param id Mã tài khoản
+   */
   async findOne(id: number) {
     let user;
     try {
@@ -167,7 +189,24 @@ export class UsersService {
     return user;
   }
 
-  //id: mã tài khoản
+  async findOneByPaymentAccount(
+    soTK: string,
+    options?: { include: Prisma.taiKhoanInclude },
+  ) {
+    try {
+      return await this.prismaService.taiKhoan.findFirst({
+        where: { taiKhoanThanhToan: { soTK } },
+        include: options?.include,
+      });
+    } catch (e) {
+      this.handleError(e);
+    }
+  }
+
+  /**
+   *
+   * @param id Mã tài khoản
+   */
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const data = await this.prismaService.khachHang.update({

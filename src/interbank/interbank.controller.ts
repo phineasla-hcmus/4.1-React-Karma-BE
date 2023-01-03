@@ -15,6 +15,7 @@ import { InterbankService } from './interbank.service';
 @Controller('interbank')
 export class InterbankController {
   constructor(private interbankService: InterbankService) {}
+
   @Get('account')
   async getAccount(@Query('account_no') account_no: string) {
     if (account_no) {
@@ -35,6 +36,7 @@ export class InterbankController {
       });
     }
   }
+
   @Get('all')
   async findAllWithoutPagination() {
     try {

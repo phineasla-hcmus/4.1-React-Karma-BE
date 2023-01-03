@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BankersModule } from './bankers/bankers.module';
+import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     TransactionsModule,
     PaymentAccountsModule,
+    ExternalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

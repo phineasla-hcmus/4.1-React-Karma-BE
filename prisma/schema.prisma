@@ -34,7 +34,7 @@ model danhSachDaLuu {
 
 model danhSachNgoaiDaLuu {
   maTK            Int             @map("MATK")
-  nguoiDung       Int             @map("NGUOIDUNG")
+  nguoiDung       String          @map("NGUOIDUNG") @db.VarChar(20)
   tenGoiNho       String          @map("TENGOINHO") @db.VarChar(20)
   maNH            Int             @map("MANH")
   nganHangLienKet nganHangLienKet @relation("DANHSACHNGOAIDALUU_MANHToNGANHANGLIENKET", fields: [maNH], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHNGOAIDALUU_NGANHANGLIENKET")
@@ -66,6 +66,18 @@ model chuyenKhoanNganHangNgoai {
   taiKhoan   taiKhoanThanhToan @relation(fields: [tkTrong], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
 
   @@map("CHUYENKHOANNGANHANGNGOAI")
+}
+
+model otpChuyenKhoan {
+  soTK      String            @id @map("SOTK") @db.VarChar(12)
+  // Tính cả liên ngân hàng
+  nguoiNhan String            @map("NGUOINHAN") @db.VarChar(20)
+  soTien    Int               @map("SOTIEN")
+  otp       Int               @map("OTP")
+  ngayTao   DateTime          @default(now()) @map("NGAYTAO") @db.Date
+  taiKhoan  taiKhoanThanhToan @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
+
+  @@map("OTPCHUYENKHOAN")
 }
 
 model nganHangLienKet {
@@ -138,6 +150,7 @@ model taiKhoanThanhToan {
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
   lichSuNapTien            lichSuNapTien[]
   thuocDanhSach            danhSachDaLuu[]            @relation("DANHSACHDALUU_NGUOIDUNGToTAIKHOANTHANHTOAN")
+  otpChuyenKhoan           otpChuyenKhoan[]
 
   @@map("TAIKHOANTHANHTOAN")
 }
