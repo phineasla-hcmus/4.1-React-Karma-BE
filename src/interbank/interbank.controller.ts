@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
@@ -29,6 +30,7 @@ import {
 } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
+import { transferDTO } from './transfer.dto';
 
 @Controller('interbank')
 export class InterbankController {
@@ -122,5 +124,10 @@ export class InterbankController {
     } catch (e) {
       throw e;
     }
+  }
+
+  @Post('transfer')
+  async externalBankTransfer(@Body() body: transferDTO) {
+    return await this.interbankService.externalBankTransfer(body);
   }
 }
