@@ -1,4 +1,6 @@
 import {
+  HttpStatus,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -12,6 +14,7 @@ import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateExternalTransactionDto } from './dto/create-external-transaction.dto';
+import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -48,10 +51,62 @@ export class TransactionsService {
     }
   }
 
-  async findAllWithPagination(pagination: PaginationDto) {
+  async getQuery(query: string) {
+    if (query.length == 8) {
+      try {
+        const accountNum = await this.prismaService.taiKhoan.findUnique({
+          where: {
+            tenDangNhap: query,
+          },
+          select: {
+            taiKhoanThanhToan: {
+              select: {
+                soTK: true,
+              },
+            },
+          },
+        });
+        if (!accountNum) {
+          throw new BadRequestException({
+            errorId: HttpStatus.NOT_FOUND,
+            message: 'Account not found',
+          });
+        }
+        return accountNum.taiKhoanThanhToan.soTK;
+      } catch (e) {
+        if (e instanceof Error) {
+          throw new InternalServerErrorException({
+            errorId: 'database_error',
+            message: e.message,
+            stack: e.stack,
+          });
+        }
+        throw e;
+      }
+    }
+    return query;
+  }
+
+  async findAllWithPagination(
+    pagination: PaginationDto,
+    query: TransactionQueryDTO,
+  ) {
     let total;
+    let data;
+    let senderKey, receiverKey;
+    if (query.receiver) {
+      receiverKey = await this.getQuery(query.receiver);
+    }
+    if (query.sender) {
+      senderKey = await this.getQuery(query.sender);
+    }
+
     try {
-      total = await this.prismaService.chuyenKhoanNoiBo.count();
+      total = await this.prismaService.chuyenKhoanNoiBo.count({
+        where: {
+          AND: [{ nguoiNhan: receiverKey }, { nguoiChuyen: senderKey }],
+        },
+      });
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -62,11 +117,19 @@ export class TransactionsService {
       }
       throw e;
     }
+
     let transactionList;
     try {
-      const data = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      data = await this.prismaService.chuyenKhoanNoiBo.findMany({
         skip: (pagination.page - 1) * pagination.size,
         take: pagination.size,
+        where: {
+          AND: [{ nguoiNhan: receiverKey }, { nguoiChuyen: senderKey }],
+        },
+        distinct: ['maCK'],
+        orderBy: {
+          ngayCK: 'desc',
+        },
       });
 
       transactionList = data.map(({ ...props }) => ({

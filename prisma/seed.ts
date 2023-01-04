@@ -83,7 +83,7 @@ async function main() {
       await prisma.danhSachDaLuu.create({
         data: {
           maTK: list[i].maTK,
-          nguoiDung: list[j].maTK,
+          nguoiDung: list[j].taiKhoanThanhToan.soTK,
           tenGoiNho: faker.lorem.word(),
         },
       });

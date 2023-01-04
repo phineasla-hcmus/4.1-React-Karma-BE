@@ -1,6 +1,5 @@
-import { randomInt } from 'crypto';
-
 import {
+  Query,
   Controller,
   Get,
   HttpException,
@@ -15,6 +14,7 @@ import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
 import { Pagination, PaginationDto } from '../pagination';
 
 import { RequestTransactionDto } from './dto/request-transaction.dto';
+import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
 import { TransactionsService } from './transactions.service';
@@ -67,9 +67,12 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAllWithPagination(@Pagination() pagination: PaginationDto) {
+  async findAllWithPagination(
+    @Pagination() pagination: PaginationDto,
+    @Query() query: TransactionQueryDTO,
+  ) {
     try {
-      return this.transactionsService.findAllWithPagination(pagination);
+      return this.transactionsService.findAllWithPagination(pagination, query);
     } catch (e) {
       throw e;
     }
