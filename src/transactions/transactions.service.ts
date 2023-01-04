@@ -13,6 +13,7 @@ import {
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { CreateExternalTransactionDto } from './dto/create-external-transaction.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
 @Injectable()
@@ -21,7 +22,7 @@ export class TransactionsService {
 
   constructor(private prismaService: PrismaService) {}
 
-  private handleError(e: unknown) {
+  private didReceiveError(e: unknown) {
     if (e instanceof PrismaClientKnownRequestError) {
       this.logger.error(`${e.code}: ${e.message}`, e.stack);
     } else if (e instanceof PrismaClientUnknownRequestError) {
@@ -29,7 +30,7 @@ export class TransactionsService {
     } else {
       this.logger.error(e);
     }
-    throw e;
+    return e;
   }
 
   async findAllWithoutPagination() {
@@ -172,5 +173,21 @@ export class TransactionsService {
         });
       }
     }
+  }
+
+  async createExternal(dto: CreateExternalTransactionDto) {
+    return this.prismaService.chuyenKhoanNganHangNgoai.create({
+      data: {
+        tkNgoai: dto.tkNgoai,
+        soTien: dto.soTien,
+        noiDungCK: dto.noiDungCK,
+        nganHangLK: {
+          connect: { tenNH: dto.nganHang },
+        },
+        taiKhoan: {
+          connect: { soTK: dto.tkTrong },
+        },
+      },
+    });
   }
 }

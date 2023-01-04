@@ -59,7 +59,7 @@ model khachHang {
 model chuyenKhoanNganHangNgoai {
   maCKN      Int               @id @default(autoincrement()) @map("MACKN")
   tkTrong    String            @map("TKTRONG") @db.VarChar(12)
-  tkNgoai    String            @map("TKNGOAI") @db.VarChar(12)
+  tkNgoai    String            @map("TKNGOAI") @db.VarChar(20)
   soTien     Int               @map("SOTIEN")
   maNganHang Int               @map("MANGANHANG")
   noiDungCK  String            @map("NOIDUNGCK") @db.Text

@@ -42,16 +42,16 @@ export class HcmusbankService {
     return sign.sign(privateKey, 'base64');
   }
 
-  private handleError(e: unknown) {
+  private didReceiveError(e: unknown) {
     if (isAxiosError(e)) {
       this.logger.error(e.toJSON());
       if (e.status < 500) {
-        throw new InternalServerErrorException({
+        return new InternalServerErrorException({
           errorId: 'bad_transaction',
           message: 'Something went wrong when connecting to HCMUSBank',
         });
       }
-      throw new InternalServerErrorException({
+      return new InternalServerErrorException({
         errorId: 'bad_interbank',
         message: 'HCMUSBank went rogue',
       });
@@ -61,7 +61,7 @@ export class HcmusbankService {
     } else {
       this.logger.error(e);
     }
-    throw new InternalServerErrorException({
+    return new InternalServerErrorException({
       errorId: 'i_dont_know',
       message: 'Good luck debuging this',
     });
@@ -81,7 +81,7 @@ export class HcmusbankService {
       );
       return res.data;
     } catch (e) {
-      this.handleError(e);
+      this.didReceiveError(e);
     }
   }
 
@@ -94,17 +94,15 @@ export class HcmusbankService {
     }
     const data = this.transformPayload(payload);
     const signature = await this.sign(data);
-    try {
-      const res = await this.axiosService.post<FindOneAccountResponseDto>(
-        `${this.baseUrl}/api/external/deposit`,
-        {
-          data,
-          signature,
-        },
-      );
-      return res.data;
-    } catch (e) {
-      this.handleError(e);
-    }
+    const res = await this.axiosService
+      .post(`${this.baseUrl}/api/external/deposit`, {
+        data,
+        signature,
+      })
+      .catch((e) => {
+        throw this.didReceiveError(e);
+      });
+    // TODO verify signature
+    return res.data;
   }
 }

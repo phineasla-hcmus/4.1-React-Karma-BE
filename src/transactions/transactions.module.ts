@@ -10,6 +10,7 @@ import { TransactionsService } from './transactions.service';
 
 @Module({
   imports: [EmailModule, UsersModule],
+  exports: [TransactionsService, TransactionOtpService],
   controllers: [TransactionsController],
   providers: [
     TransactionsService,
