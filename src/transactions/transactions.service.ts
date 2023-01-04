@@ -3,7 +3,12 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+} from '@prisma/client/runtime';
 
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
@@ -13,7 +18,20 @@ import { send } from 'process';
 
 @Injectable()
 export class TransactionsService {
+  private readonly logger: Logger = new Logger(TransactionsService.name);
+
   constructor(private prismaService: PrismaService) {}
+
+  private handleError(e: unknown) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      this.logger.error(`${e.code}: ${e.message}`, e.stack);
+    } else if (e instanceof PrismaClientUnknownRequestError) {
+      this.logger.error(e.message, e.stack);
+    } else {
+      this.logger.error(e);
+    }
+    throw e;
+  }
 
   async findAllWithoutPagination() {
     try {

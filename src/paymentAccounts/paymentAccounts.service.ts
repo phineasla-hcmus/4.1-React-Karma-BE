@@ -1,16 +1,12 @@
-import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PaymentAccountsService {
   constructor(private prismaService: PrismaService) {}
 
-  public async getInfoByAccountNo(account_no: string) {
+  public async getInfoByAccountNo(soTK: string) {
     const user = await this.prismaService.taiKhoanThanhToan.findFirst({
       select: {
         soTK: true,
@@ -25,7 +21,7 @@ export class PaymentAccountsService {
         },
       },
       where: {
-        soTK: account_no,
+        soTK,
         taiKhoan: {
           hoatDong: true,
         },

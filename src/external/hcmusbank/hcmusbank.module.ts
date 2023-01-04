@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AxiosModule } from '../axios/axios.module';
+import { AxiosModule } from '../../axios/axios.module';
 
 import { HcmusbankService } from './hcmusbank.service';
 
@@ -10,4 +10,4 @@ import { HcmusbankService } from './hcmusbank.service';
   imports: [ConfigModule, AxiosModule],
   exports: [HcmusbankService],
 })
-export class InterbankModule {}
+export class HcmusbankModule {}

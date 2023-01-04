@@ -12,7 +12,7 @@ import {
   PAGINATION_MIN_SIZE,
   DEFAULT_PAGINATION_PAGE,
   DEFAULT_PAGINATION_SIZE,
-} from './constants';
+} from '../constants';
 import { PaginationDto } from './pagination.dto';
 
 interface PaginationRawDto {
