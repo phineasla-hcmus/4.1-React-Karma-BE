@@ -10,8 +10,8 @@ import {
 
 import { Pagination, PaginationDto } from '../pagination';
 
-import { InterbankService } from './interbank.service';
 import { QueryDTO } from './dto/query.dto';
+import { InterbankService } from './interbank.service';
 
 @Controller('interbank')
 export class InterbankController {

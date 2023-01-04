@@ -1,6 +1,4 @@
 import {
-  BadRequestException,
-  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -13,6 +11,7 @@ import {
 import { formatResponse, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
+
 import { QueryDTO } from './dto/query.dto';
 
 @Injectable()
@@ -125,7 +124,7 @@ export class InterbankService {
       'interbank',
     );
     try {
-      let [sent, received] = [
+      const [sent, received] = [
         await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
           _sum: { soTien: true },
           where: {
