@@ -16,7 +16,7 @@ export class TransactionOtpService {
 
   constructor(private prismaService: PrismaService) {}
 
-  private handleError(e: unknown) {
+  private didReceiveError(e: unknown) {
     if (e instanceof PrismaClientKnownRequestError) {
       this.logger.error(`${e.code}: ${e.message}`, e.stack);
     } else if (e instanceof PrismaClientUnknownRequestError) {
@@ -33,7 +33,7 @@ export class TransactionOtpService {
         where: { soTK },
       });
     } catch (e) {
-      this.handleError(e);
+      this.didReceiveError(e);
     }
   }
 
@@ -57,7 +57,7 @@ export class TransactionOtpService {
         create: { ...data, otp },
       });
     } catch (e) {
-      this.handleError(e);
+      this.didReceiveError(e);
     }
   }
 
@@ -65,7 +65,7 @@ export class TransactionOtpService {
     try {
       return this.prismaService.otpChuyenKhoan.delete({ where: { soTK } });
     } catch (e) {
-      this.handleError(e);
+      this.didReceiveError(e);
     }
   }
 }
