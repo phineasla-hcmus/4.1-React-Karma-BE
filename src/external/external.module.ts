@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { AxiosModule } from '../axios/axios.module';
 

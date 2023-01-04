@@ -12,9 +12,8 @@ import {
 
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
+
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
-import { chuyenKhoanNoiBo } from '@prisma/client';
-import { send } from 'process';
 
 @Injectable()
 export class TransactionsService {
@@ -100,8 +99,6 @@ export class TransactionsService {
     if (query.sender) {
       senderKey = await this.getQuery(query.sender);
     }
-    console.log('recv', receiverKey);
-    console.log('send', senderKey);
 
     try {
       total = await this.prismaService.chuyenKhoanNoiBo.count({

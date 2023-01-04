@@ -1,8 +1,5 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { randomInt } from 'crypto';
-
-
 import {
+  Query,
   Controller,
   Get,
   HttpException,
@@ -17,10 +14,10 @@ import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
 import { Pagination, PaginationDto } from '../pagination';
 
 import { RequestTransactionDto } from './dto/request-transaction.dto';
+import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
 import { TransactionsService } from './transactions.service';
-import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
 @Controller('transactions')
 export class TransactionsController {
