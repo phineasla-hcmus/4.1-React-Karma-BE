@@ -124,7 +124,7 @@ model nhanVien {
 
 model taiKhoan {
   maTK              Int                @id @default(autoincrement()) @map("MATK")
-  tenDangNhap       String             @unique @map("TENDANGNHAP") @db.VarChar(12)
+  tenDangNhap       String             @unique @map("TENDANGNHAP") @db.VarChar(8)
   matKhau           String             @map("MATKHAU") @db.VarChar(100)
   vaiTro            vaitro             @map("VAITRO")
   refreshToken      String?            @map("REFRESHTOKEN") @db.VarChar(256)
