@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import monitor from 'express-status-monitor';
 
@@ -7,6 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(monitor());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(3003);
 }
 bootstrap();
