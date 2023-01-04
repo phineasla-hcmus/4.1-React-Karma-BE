@@ -14,6 +14,8 @@ model chuyenKhoanNoiBo {
   soTien         Int               @map("SOTIEN")
   noiDungCK      String?           @map("NOIDUNGCK")
   ngayCK         DateTime          @default(now()) @map("NGAYCK")
+  loaiCK         LoaiCK            @default(sender) @map("LOAICK")
+  phiCK          Int               @default(0) @map("PHICK")
   taiKhoanChuyen taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOICHUYENToTAIKHOANTHANHTOAN", fields: [nguoiChuyen], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN1")
   taiKhoanNhan   taiKhoanThanhToan @relation("CHUYENKHOAN_NGUOINHANToTAIKHOANTHANHTOAN", fields: [nguoiNhan], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOAN_TAIKHOANTHANHTOAN2")
   nhacNo         nhacNo?           @relation("NHACNO_GIAODICHLIENKET")
@@ -62,6 +64,8 @@ model chuyenKhoanNganHangNgoai {
   maNganHang Int               @map("MANGANHANG")
   noiDungCK  String            @map("NOIDUNGCK") @db.Text
   thoiGian   DateTime          @default(now()) @map("THOIGIAN")
+  loaiCK     LoaiCK            @default(sender) @map("LOAICK")
+  phiCK      Int               @default(0) @map("PHICK")
   nganHangLK nganHangLienKet   @relation(fields: [maNganHang], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGANHANGNGOAI")
   taiKhoan   taiKhoanThanhToan @relation(fields: [tkTrong], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
 
@@ -83,7 +87,7 @@ model otpChuyenKhoan {
 model nganHangLienKet {
   maNH        Int         @id @default(autoincrement()) @map("MANH")
   tenNH       String      @map("TENNH") @db.VarChar(50)
-  kPublic     String      @map("KPUBLIC") @db.VarChar(256)
+  kPublic     String      @map("KPUBLIC") @db.Text
   coCheBaoMat CoCheBaoMat @default(RSA)
 
   chuyenKhoanNganHangNgoai chuyenKhoanNganHangNgoai[]
@@ -165,6 +169,11 @@ model lichSuNapTien {
   taiKhoanThanhToan taiKhoanThanhToan? @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_TAIKHOANTHANHTOAN")
 
   @@map("LICHSUNAPTIEN")
+}
+
+enum LoaiCK {
+  sender
+  receiver
 }
 
 enum vaitro {
