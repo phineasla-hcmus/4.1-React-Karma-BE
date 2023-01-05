@@ -86,7 +86,7 @@ model otpChuyenKhoan {
 
 model nganHangLienKet {
   maNH        Int         @id @default(autoincrement()) @map("MANH")
-  tenNH       String      @map("TENNH") @db.VarChar(50)
+  tenNH       String      @unique @map("TENNH") @db.VarChar(50)
   kPublic     String      @map("KPUBLIC") @db.Text
   coCheBaoMat CoCheBaoMat @default(RSA)
 
