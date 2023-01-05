@@ -1,6 +1,4 @@
 import { createSign } from 'crypto';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 
 import {
   Inject,

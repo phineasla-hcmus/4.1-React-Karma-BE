@@ -3,7 +3,6 @@ import { join } from 'path';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { async } from 'rxjs';
 
 import { AxiosModule } from '../../axios/axios.module';
 
@@ -25,6 +24,6 @@ import { HcmusbankService } from './hcmusbank.service';
     HcmusbankService,
   ],
   imports: [ConfigModule, AxiosModule],
-  exports: [HcmusbankService],
+  exports: ['HCMUS_PRIVATE_KEY_TOKEN', HcmusbankService],
 })
 export class HcmusbankModule {}

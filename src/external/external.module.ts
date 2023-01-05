@@ -9,7 +9,7 @@ import { HcmusbankModule } from './hcmusbank/hcmusbank.module';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
 
 @Module({
-  providers: [HcmusbankService, ExternalService],
+  providers: [ExternalService, HcmusbankService],
   imports: [AxiosModule, TransactionsModule, HcmusbankModule],
   controllers: [ExternalController],
 })
