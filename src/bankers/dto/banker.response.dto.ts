@@ -14,11 +14,10 @@ class BankerDto {
   maTK: number;
 }
 
-export class CreateBankerResponseDto {
+export class BankerResponseDto {
   @ApiProperty()
   maTK: number;
-  hoTen: string;
-  sdt: string;
+
   @ApiProperty()
   tenDangNhap: string;
 
@@ -37,6 +36,14 @@ export class CreateBankerResponseDto {
   @ApiProperty()
   nhanVien: BankerDto;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Mã tài khoản' })
+  id: number;
+}
+
+export class UpdateBankerResponseDto {
+  @ApiProperty({ description: 'Profile of a banker' })
+  data: BankerDto;
+
+  @ApiProperty({ description: 'Mã tài khoản' })
   id: number;
 }

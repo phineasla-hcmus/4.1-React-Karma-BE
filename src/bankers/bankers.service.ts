@@ -12,14 +12,13 @@ import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateBankerDto } from './dto/create-banker.dto';
-import { CreateBankerResponseDto } from './dto/create-banker.response.dto';
 import { UpdateBankerDto } from './dto/update-banker.dto';
 
 @Injectable()
 export class BankersService {
   constructor(private prismaService: PrismaService) {}
 
-  async create(createBankerDto: CreateBankerDto | CreateBankerResponseDto) {
+  async create(createBankerDto: CreateBankerDto) {
     const tenDangNhap = faker.random.numeric(8);
     const matKhau = bcrypt.hashSync(tenDangNhap, 10);
     try {
