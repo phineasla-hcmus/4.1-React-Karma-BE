@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { type } from 'os';
-
 import {
   Controller,
   Get,
@@ -13,14 +10,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ApiBody,
-  ApiCreatedResponse,
-  ApiDefaultResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
