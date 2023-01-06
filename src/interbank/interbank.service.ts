@@ -12,6 +12,8 @@ import { formatResponse, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { InterbankTransactionQueryDto } from './dto/query.dto';
+
 @Injectable()
 export class InterbankService {
   private readonly logger: Logger = new Logger(InterbankService.name);
@@ -58,10 +60,25 @@ export class InterbankService {
     }
   }
 
-  async findAllWithPagination(pagination: PaginationDto) {
+  async findAllWithPagination(
+    pagination: PaginationDto,
+    query: InterbankTransactionQueryDto,
+  ) {
+    const from = query.from ? new Date(query.from) : undefined;
+    const to = query.to ? new Date(query.to) : undefined;
+    const maNH = +query.bankID || undefined;
+
     let total;
     try {
-      total = await this.prismaService.chuyenKhoanNganHangNgoai.count();
+      total = await this.prismaService.chuyenKhoanNganHangNgoai.count({
+        where: {
+          thoiGian: {
+            gte: from,
+            lte: to,
+          },
+          maNganHang: maNH,
+        },
+      });
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
@@ -80,6 +97,13 @@ export class InterbankService {
         include: {
           nganHangLK: true,
         },
+        where: {
+          thoiGian: {
+            gte: from,
+            lte: to,
+          },
+          maNganHang: maNH,
+        },
       });
       interbankList = data.map(({ ...props }) => ({
         ...props,
@@ -95,14 +119,52 @@ export class InterbankService {
       }
     }
     const lastPage = Math.ceil(total / pagination.size);
-
-    return formatResponse(
+    const res = formatResponse(
       pagination,
       total,
       lastPage,
       interbankList,
       'interbank',
     );
+    try {
+      const [sent, received] = [
+        await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
+          _sum: { soTien: true },
+          where: {
+            soTien: {
+              lt: 0,
+            },
+            thoiGian: {
+              gte: from,
+              lte: to,
+            },
+            maNganHang: maNH,
+          },
+        }),
+        await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
+          _sum: { soTien: true },
+          where: {
+            soTien: { gt: 0 },
+            thoiGian: {
+              gte: from,
+              lte: to,
+            },
+            maNganHang: maNH,
+          },
+        }),
+      ];
+      res['soTienGui'] = 0 - sent._sum.soTien;
+      res['soTienNhan'] = 0 + received._sum.soTien;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new InternalServerErrorException({
+          errorId: e.name,
+          message: e.message,
+          stack: e.stack,
+        });
+      }
+    }
+    return res;
   }
 
   /**
