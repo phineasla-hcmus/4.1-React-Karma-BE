@@ -1,29 +1,43 @@
 import {
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
+import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
 
-import { FindOneAccountDto } from './dto/find-one-account.dto';
+import { FindOneBankDto } from './dto/find-one-bank.dto';
+import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
 
 @Injectable()
 export class ExternalService {
   constructor(
+    private prismaService: PrismaService,
+    private paymentAccountService: PaymentAccountsService,
     private otpService: TransactionOtpService,
     private transactionService: TransactionsService,
     private hcmusbankService: HcmusbankService,
   ) {}
 
-  async findOneAccount(findOneAccountDto: FindOneAccountDto) {
-    switch (findOneAccountDto.nganHang) {
+  async findOneBank({ id, name }: FindOneBankDto) {
+    if (id == null || name == null) {
+      return null;
+    }
+    return this.prismaService.nganHangLienKet.findUnique({
+      where: { maNH: id, tenNH: name },
+    });
+  }
+
+  async findOneExternal(findOneExternalDto: FindOneExternalDto) {
+    switch (findOneExternalDto.nganHang) {
       case 'HCMUSBank': {
-        return this.hcmusbankService.findOneAccount(findOneAccountDto);
+        return this.hcmusbankService.findOneAccount(findOneExternalDto);
       }
     }
     return null;
@@ -47,16 +61,30 @@ export class ExternalService {
         message: 'Invalid OTP',
       });
     }
-    await this.otpService.delete(otp.soTK);
-    let res: any;
+    await Promise.all([
+      this.findOneBank({ name: transferDto.nganHang }).then((v) => {
+        if (v != null) return v;
+        throw new NotFoundException({
+          errorId: 'bank_not_found',
+          message: `Cannot find bank with name ${transferDto.nganHang}`,
+        });
+      }),
+      this.paymentAccountService.findOne(transferDto.soTK).then((v) => {
+        if (v != null) return v;
+        throw new NotFoundException({
+          errorId: 'payment_account_not_found',
+          message: `Cannot find payment account with ${transferDto.soTK}`,
+        });
+      }),
+    ]);
     switch (transferDto.nganHang) {
       case 'HCMUSBank': {
-        res = await this.hcmusbankService.transfer({
+        await this.hcmusbankService.transfer({
           fromAccountNumber: transferDto.soTK,
           toAccountNumber: transferDto.nguoiNhan,
           amount: transferDto.soTien,
           message: transferDto.noiDung,
-          payer: transferDto.hinhThuc,
+          payer: transferDto.loaiCK,
         });
         break;
       }
@@ -66,19 +94,15 @@ export class ExternalService {
           message: `Cannot find bank with name ${transferDto.nganHang}`,
         });
     }
-    if (res == null) {
-      throw new InternalServerErrorException({
-        errorId: 'bad_transaction',
-        message: 'Something went wrong when connecting to HCMUSBank',
-      });
-    }
+    await this.otpService.delete(otp.soTK);
+    // Shouldn't throw P2018 because we already checked payment account and bank are valid
     return this.transactionService.createExternal({
-      tkTrong: transferDto.soTK,
-      tkNgoai: transferDto.nguoiNhan,
-      nganHang: transferDto.nganHang,
+      internal: transferDto.soTK,
+      external: transferDto.nguoiNhan,
+      bank: transferDto.nganHang,
       // Minus indicate a deposit transaction
-      soTien: -transferDto.soTien,
-      noiDungCK: transferDto.noiDung,
+      amount: -transferDto.soTien,
+      message: transferDto.noiDung,
     });
   }
 }

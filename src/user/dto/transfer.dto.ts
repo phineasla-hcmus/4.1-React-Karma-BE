@@ -10,9 +10,6 @@ export class TransferDto {
   soTK: string;
 
   @IsNotEmpty()
-  nganHang: string;
-
-  @IsNotEmpty()
   nguoiNhan: string;
 
   @IsNumber()

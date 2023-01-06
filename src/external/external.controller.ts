@@ -1,6 +1,6 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
 
-import { FindOneAccountDto } from './dto/find-one-account.dto';
+import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { ExternalService } from './external.service';
 
@@ -9,8 +9,8 @@ export class ExternalController {
   constructor(private externalService: ExternalService) {}
 
   @Post('account')
-  async findOneAccount(@Body() findOneAccountDto: FindOneAccountDto) {
-    const data = await this.externalService.findOneAccount(findOneAccountDto);
+  async findOneAccount(@Body() findOneAccountDto: FindOneExternalDto) {
+    const data = await this.externalService.findOneExternal(findOneAccountDto);
     if (data != null) {
       return data;
     }

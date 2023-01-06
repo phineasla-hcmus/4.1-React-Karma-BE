@@ -9,3 +9,5 @@ export const AUTH_OTP_TTL = 3 * 60 * 1000;
 
 export const REFRESH_TOKEN_TTL = 2.628e9; // 1 month
 export const ACCESS_TOKEN_TTL = 900000; // 15 minutes
+
+export const FEE = 5000; // VND

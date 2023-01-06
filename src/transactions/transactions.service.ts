@@ -14,6 +14,7 @@ import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateExternalTransactionDto } from './dto/create-external-transaction.dto';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
 @Injectable()
@@ -175,17 +176,30 @@ export class TransactionsService {
     }
   }
 
+  async create(dto: CreateTransactionDto) {
+    return this.prismaService.chuyenKhoanNoiBo.create({
+      data: {
+        taiKhoanChuyen: { connect: { soTK: dto.sender } },
+        taiKhoanNhan: { connect: { soTK: dto.receiver } },
+        soTien: dto.amount,
+        noiDungCK: dto.message,
+        loaiCK: dto.feeType,
+        phiCK: dto.fee,
+      },
+    });
+  }
+
   async createExternal(dto: CreateExternalTransactionDto) {
     return this.prismaService.chuyenKhoanNganHangNgoai.create({
       data: {
-        tkNgoai: dto.tkNgoai,
-        soTien: dto.soTien,
-        noiDungCK: dto.noiDungCK,
+        tkNgoai: dto.external,
+        soTien: dto.amount,
+        noiDungCK: dto.message,
         nganHangLK: {
-          connect: { tenNH: dto.nganHang },
+          connect: { tenNH: dto.bank },
         },
         taiKhoan: {
-          connect: { soTK: dto.tkTrong },
+          connect: { soTK: dto.internal },
         },
       },
     });

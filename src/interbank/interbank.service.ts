@@ -33,7 +33,7 @@ export class InterbankService {
   }
 
   async getPaymentAccountInfo(soTK: string) {
-    return await this.paymentAccountService.getInfoByAccountNo(soTK);
+    return await this.paymentAccountService.findOneInfo(soTK);
   }
 
   async findAllWithoutPagination() {

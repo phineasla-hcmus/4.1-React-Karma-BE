@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class FindOneAccountDto {
+export class FindOneExternalDto {
   @IsString()
   @IsNotEmpty()
   nganHang: string;
