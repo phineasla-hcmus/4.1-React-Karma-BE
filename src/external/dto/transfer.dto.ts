@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, Min } from 'class-validator';
+
+import { FeeType } from '../../types';
 
 export class TransferDto {
   @IsNumber()
@@ -20,6 +22,6 @@ export class TransferDto {
   @IsNotEmpty()
   noiDung: string;
 
-  @IsNotEmpty()
-  hinhThuc: 'sender' | 'receiver';
+  @IsEnum(FeeType)
+  loaiCK: FeeType;
 }
