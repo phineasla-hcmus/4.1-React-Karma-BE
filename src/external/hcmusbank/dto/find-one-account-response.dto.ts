@@ -1,9 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export interface FindOneAccountResponseDto {
+export class FindOneAccountResponseDto {
   message: string;
+
   id: string;
+
+  @ApiProperty()
   accountNumber: string;
+
+  @ApiProperty()
   firstName: string;
+
+  @ApiProperty()
   lastName: string;
+}
+
+export class WrapFindOneAccountResponseDto {
+  @ApiProperty()
+  data: FindOneAccountResponseDto;
 }
