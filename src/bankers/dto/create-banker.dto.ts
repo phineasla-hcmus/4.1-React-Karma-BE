@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBankerDto {
-  @ApiProperty({
-    type: String,
-  })
+  @ApiProperty()
   hoTen: string;
 
   @ApiProperty()

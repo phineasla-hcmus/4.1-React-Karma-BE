@@ -1,5 +1,6 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
+  ApiExtraModels,
   ApiOkResponse,
   ApiProperty,
   ApiPropertyOptional,
@@ -30,16 +31,44 @@ export class PaginationDto {
 export const ApiPaginatedResponse = <TModel extends Type<any>>(
   model: TModel,
 ) => {
-  console.log(getSchemaPath(model));
-
   return applyDecorators(
+    ApiExtraModels(PaginationDto),
     ApiOkResponse({
+      description: 'Successfully received model list',
       schema: {
         allOf: [
           { $ref: getSchemaPath(PaginationDto) },
           {
             properties: {
-              results: {
+              total: {
+                type: 'number',
+              },
+              links: {
+                properties: {
+                  self: {
+                    properties: {
+                      href: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                  next: {
+                    properties: {
+                      href: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                  last: {
+                    properties: {
+                      href: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+              data: {
                 type: 'array',
                 items: { $ref: getSchemaPath(model) },
               },

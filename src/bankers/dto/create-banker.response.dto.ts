@@ -1,9 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseDto {
+class BankerDto {
+  @ApiProperty()
+  maNV: number;
+
+  @ApiProperty()
+  hoTen: string;
+
+  @ApiProperty()
+  sdt: string;
+
   @ApiProperty()
   maTK: number;
+}
 
+export class CreateBankerResponseDto {
+  @ApiProperty()
+  maTK: number;
+  hoTen: string;
+  sdt: string;
   @ApiProperty()
   tenDangNhap: string;
 
@@ -19,13 +34,8 @@ export class ResponseDto {
   @ApiProperty()
   hoatDong: boolean;
 
-  // @ApiProperty()
-  // nhanVien: {
-  //   maNV: number;
-  //   hoTen: string;
-  //   sdt: string;
-  //   maTK: number;
-  // };
+  @ApiProperty()
+  nhanVien: BankerDto;
 
   @ApiProperty()
   id: number;

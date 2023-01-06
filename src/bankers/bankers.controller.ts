@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { type } from 'os';
+
 import {
   Controller,
   Get,
@@ -10,8 +13,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiCreatedResponse,
+  ApiDefaultResponse,
   ApiExtraModels,
+  ApiOkResponse,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -21,7 +27,7 @@ import { ApiPaginatedResponse, Pagination, PaginationDto } from '../pagination';
 
 import { BankersService } from './bankers.service';
 import { CreateBankerDto } from './dto/create-banker.dto';
-import { ResponseDto } from './dto/response.dto';
+import { CreateBankerResponseDto } from './dto/create-banker.response.dto';
 import { UpdateBankerDto } from './dto/update-banker.dto';
 
 @ApiTags('bankers')
@@ -43,8 +49,10 @@ export class BankersController {
   }
 
   @Get('all')
-  // @ApiPaginatedResponse(ResponseDto)
-  async findAllWithoutPagination() {
+  @ApiPaginatedResponse(CreateBankerResponseDto)
+  async findAllWithoutPagination(
+    @Body() createBankerDto: CreateBankerResponseDto,
+  ) {
     try {
       const data = await this.bankersService.findAllWithoutPagination();
       return { data };
@@ -54,7 +62,7 @@ export class BankersController {
   }
 
   @Get()
-  // @ApiPaginatedResponse(ResponseDto)
+  @ApiPaginatedResponse(CreateBankerResponseDto)
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
       const data = await this.bankersService.findAllWithPagination(pagination);
@@ -65,7 +73,15 @@ export class BankersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @ApiOkResponse({
+    description: 'The user records',
+    type: CreateBankerResponseDto,
+    isArray: true,
+  })
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createBankerDto: CreateBankerResponseDto,
+  ) {
     try {
       return this.bankersService.findOne(id);
     } catch (e) {
