@@ -6,7 +6,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PaymentAccountsService {
   constructor(private prismaService: PrismaService) {}
 
-  public async getInfoByAccountNo(soTK: string) {
+  async findOne(soTK: string) {
+    return this.prismaService.taiKhoanThanhToan.findUnique({
+      where: { soTK: soTK },
+    });
+  }
+
+  async findOneInfo(soTK: string) {
     const user = await this.prismaService.taiKhoanThanhToan.findFirst({
       select: {
         soTK: true,

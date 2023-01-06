@@ -1,7 +1,7 @@
 export interface CreateExternalTransactionDto {
-  tkTrong: string;
-  tkNgoai: string;
-  nganHang: string;
-  soTien: number;
-  noiDungCK: string;
+  internal: string;
+  external: string;
+  bank: string;
+  amount: number;
+  message: string;
 }

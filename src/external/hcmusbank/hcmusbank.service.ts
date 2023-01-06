@@ -1,8 +1,7 @@
 import { createSign } from 'crypto';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -22,8 +21,10 @@ export class HcmusbankService {
   baseUrl: string;
 
   constructor(
-    private readonly configService: ConfigService,
+    @Inject('HCMUS_PRIVATE_KEY_TOKEN')
+    private readonly privateKey: Buffer | string,
     private readonly axiosService: AxiosService,
+    configService: ConfigService,
   ) {
     this.baseUrl = configService.getOrThrow('HCMUSBANK_BASE_URL');
   }
@@ -35,11 +36,10 @@ export class HcmusbankService {
   }
 
   private async sign(transformedPayload: string) {
-    const privateKey = await readFile(join(__dirname, 'hcmusbank.private.pem'));
     const sign = createSign('RSA-SHA256');
     sign.update(transformedPayload);
     sign.end();
-    return sign.sign(privateKey, 'base64');
+    return sign.sign(this.privateKey, 'base64');
   }
 
   private didReceiveError(e: unknown) {

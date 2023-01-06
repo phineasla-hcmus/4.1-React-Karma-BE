@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { AxiosModule } from '../axios/axios.module';
+import { PaymentAccountsModule } from '../paymentAccounts/paymentAccounts.module';
 import { TransactionsModule } from '../transactions/transactions.module';
 
 import { ExternalController } from './external.controller';
@@ -9,8 +10,13 @@ import { HcmusbankModule } from './hcmusbank/hcmusbank.module';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
 
 @Module({
-  providers: [HcmusbankService, ExternalService],
-  imports: [AxiosModule, TransactionsModule, HcmusbankModule],
+  providers: [ExternalService, HcmusbankService],
+  imports: [
+    AxiosModule,
+    TransactionsModule,
+    PaymentAccountsModule,
+    HcmusbankModule,
+  ],
   controllers: [ExternalController],
 })
 export class ExternalModule {}

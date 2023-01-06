@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class QueryDTO {
+export class InterbankTransactionQueryDto {
   @ApiProperty({
     description: 'Start date - format ioString',
   })
