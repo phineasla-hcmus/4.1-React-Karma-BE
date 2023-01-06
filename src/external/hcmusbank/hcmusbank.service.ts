@@ -1,10 +1,13 @@
 import { createSign } from 'crypto';
 
 import {
+  BadRequestException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isAxiosError } from 'axios';
@@ -44,11 +47,24 @@ export class HcmusbankService {
 
   private didReceiveError(e: unknown) {
     if (isAxiosError(e)) {
-      this.logger.error(e.toJSON());
-      if (e.status < 500) {
+      if (!e.response) {
         return new InternalServerErrorException({
-          errorId: 'bad_transaction',
-          message: 'Something went wrong when connecting to HCMUSBank',
+          errorId: 'bad_interbank',
+          message: 'HCMUSBank went rogue',
+        });
+      }
+      const status = e.response.status;
+      this.logger.error(`Status: ${status}`, JSON.stringify(e.response.data));
+      if (status == HttpStatus.BAD_REQUEST) {
+        return new BadRequestException({
+          errorId: 'bad_transaction_request',
+          message: 'Invalid parameter received',
+        });
+      }
+      if (status == HttpStatus.NOT_FOUND) {
+        return new NotFoundException({
+          errorId: 'payment_account_not_found',
+          message: 'Cannot find payment account from HCMUSBank',
         });
       }
       return new InternalServerErrorException({
@@ -81,7 +97,7 @@ export class HcmusbankService {
       );
       return res.data;
     } catch (e) {
-      this.didReceiveError(e);
+      throw this.didReceiveError(e);
     }
   }
 

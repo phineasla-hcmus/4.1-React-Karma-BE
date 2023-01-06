@@ -1,5 +1,5 @@
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
@@ -35,13 +35,13 @@ export class ExternalController {
   @ApiOperation({
     summary: 'Interbank transfer',
   })
-  @ApiOkResponse({
+  @ApiOkWrappedResponse({
     description: 'Successfully transfer',
     type: FindOneExternalDto,
   })
   async transfer(@Body() transferDto: TransferDto) {
     try {
-      return this.externalService.transfer(transferDto);
+      return { data: await this.externalService.transfer(transferDto) };
     } catch (e) {
       throw e;
     }
