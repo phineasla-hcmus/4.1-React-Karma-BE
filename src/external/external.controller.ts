@@ -1,14 +1,23 @@
-import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { ExternalService } from './external.service';
-
+import { WrapFindOneAccountResponseDto } from './hcmusbank/dto/find-one-account-response.dto';
+@ApiTags('external')
 @Controller('external')
 export class ExternalController {
   constructor(private externalService: ExternalService) {}
 
   @Post('account')
+  @ApiOperation({
+    summary: 'Return an account number of HCMUSBank',
+  })
+  @ApiOkResponse({
+    description: 'Successfully get an account number of HCMUSBank',
+    type: WrapFindOneAccountResponseDto,
+  })
   async findOneAccount(@Body() findOneAccountDto: FindOneExternalDto) {
     const data = await this.externalService.findOneExternal(findOneAccountDto);
     if (data != null) {
@@ -21,6 +30,13 @@ export class ExternalController {
   }
 
   @Post('transfer')
+  @ApiOperation({
+    summary: 'Interbank transfer',
+  })
+  @ApiOkResponse({
+    description: 'Successfully transfer',
+    type: FindOneExternalDto,
+  })
   async transfer(@Body() transferDto: TransferDto) {
     try {
       return this.externalService.transfer(transferDto);
