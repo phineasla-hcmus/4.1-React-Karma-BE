@@ -7,12 +7,14 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { Pagination, PaginationDto } from '../pagination';
 
 import { QueryDTO } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
+@ApiTags('interbank')
 @Controller('interbank')
 export class InterbankController {
   constructor(private interbankService: InterbankService) {}

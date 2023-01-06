@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
 import { Pagination, PaginationDto } from '../pagination';
@@ -19,6 +20,7 @@ import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
 import { TransactionsService } from './transactions.service';
 
+@ApiTags('transactions')
 @Controller('transactions')
 export class TransactionsController {
   constructor(

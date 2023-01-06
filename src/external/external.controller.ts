@@ -1,9 +1,11 @@
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { FindOneAccountDto } from './dto/find-one-account.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { ExternalService } from './external.service';
 
+@ApiTags('external')
 @Controller('external')
 export class ExternalController {
   constructor(private externalService: ExternalService) {}

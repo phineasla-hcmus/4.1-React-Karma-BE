@@ -9,19 +9,31 @@ import {
   ParseIntPipe,
   HttpStatus,
 } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
-import { Pagination, PaginationDto } from '../pagination';
+import { ApiPaginatedResponse, Pagination, PaginationDto } from '../pagination';
 
 import { BankersService } from './bankers.service';
 import { CreateBankerDto } from './dto/create-banker.dto';
+import { ResponseDto } from './dto/response.dto';
 import { UpdateBankerDto } from './dto/update-banker.dto';
 
+@ApiTags('bankers')
 @Controller('bankers')
+@ApiExtraModels(PaginationDto)
 export class BankersController {
   constructor(private readonly bankersService: BankersService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Tạo banker thành công',
+  })
   async create(@Body() createBankerDto: CreateBankerDto) {
     try {
       return await this.bankersService.create(createBankerDto);
@@ -31,6 +43,7 @@ export class BankersController {
   }
 
   @Get('all')
+  // @ApiPaginatedResponse(ResponseDto)
   async findAllWithoutPagination() {
     try {
       const data = await this.bankersService.findAllWithoutPagination();
@@ -41,6 +54,7 @@ export class BankersController {
   }
 
   @Get()
+  // @ApiPaginatedResponse(ResponseDto)
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
       const data = await this.bankersService.findAllWithPagination(pagination);
