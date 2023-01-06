@@ -14,7 +14,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiPaginatedResponse, Pagination, PaginationDto } from '../pagination';
+import { BankerResponseDto } from '../bankers/dto/banker.response.dto';
+import {
+  ApiPaginatedResponse,
+  ApiWrapResponse,
+  Pagination,
+  PaginationDto,
+} from '../pagination';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
@@ -55,6 +61,7 @@ export class InterbankController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of interbank transfer',
   })
+  // @ApiWrapResponse(BankerResponseDto)
   @ApiOkResponse({
     description:
       'Successfully received a non-paginated list of interbank transfer',

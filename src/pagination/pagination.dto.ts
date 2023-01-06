@@ -79,3 +79,23 @@ export const ApiPaginatedResponse = <TModel extends Type<any>>(
     }),
   );
 };
+
+export const ApiWrapResponse = <TModel extends Type<any>>(model: TModel) => {
+  return applyDecorators(
+    ApiExtraModels(PaginationDto),
+    ApiOkResponse({
+      schema: {
+        allOf: [
+          {
+            properties: {
+              data: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+};

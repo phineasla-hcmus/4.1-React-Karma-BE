@@ -18,7 +18,12 @@ import {
 } from '@nestjs/swagger';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
-import { ApiPaginatedResponse, Pagination, PaginationDto } from '../pagination';
+import {
+  ApiPaginatedResponse,
+  ApiWrapResponse,
+  Pagination,
+  PaginationDto,
+} from '../pagination';
 
 import { BankersService } from './bankers.service';
 import {
@@ -54,11 +59,8 @@ export class BankersController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of bankers',
   })
-  @ApiOkResponse({
-    description: 'Successfully received a non-paginated list of bankers',
-    type: [BankerResponseDto],
-  })
-  async findAllWithoutPagination(@Body() createBankerDto: BankerResponseDto) {
+  @ApiWrapResponse(BankerResponseDto)
+  async findAllWithoutPagination() {
     try {
       const data = await this.bankersService.findAllWithoutPagination();
       return { data };

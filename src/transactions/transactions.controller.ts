@@ -8,13 +8,25 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Body,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
-import { Pagination, PaginationDto } from '../pagination';
+import {
+  ApiPaginatedResponse,
+  ApiWrapResponse,
+  Pagination,
+  PaginationDto,
+} from '../pagination';
 
 import { RequestTransactionDto } from './dto/request-transaction.dto';
+import { ResponseTransactionDto } from './dto/transaction.response.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
@@ -30,6 +42,13 @@ export class TransactionsController {
   ) {}
 
   @Post('request')
+  // @ApiOperation({
+  //   summary: 'Create a banker',
+  // })
+  // @ApiOkResponse({
+  //   description: 'Return information of the created banker',
+  //   type: BankerResponseDto,
+  // })
   async requestTransaction({ soTK, nguoiNhan, soTien }: RequestTransactionDto) {
     const otp = await this.transactionOtpService.findOne(soTK).catch(() => {
       throw new InternalServerErrorException({
@@ -59,7 +78,11 @@ export class TransactionsController {
   }
 
   @Get('all')
-  async findAllWithoutPagination() {
+  @ApiOperation({
+    summary: 'Fetch a non-paginated list of transactions',
+  })
+  @ApiWrapResponse(ResponseTransactionDto)
+  async findAllWithoutPagination(@Body() res: ResponseTransactionDto) {
     try {
       const data = await this.transactionsService.findAllWithoutPagination();
       return { data };
@@ -69,6 +92,10 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Fetch a paginated list of transactions',
+  })
+  @ApiPaginatedResponse(ResponseTransactionDto)
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: TransactionQueryDTO,
@@ -80,8 +107,16 @@ export class TransactionsController {
     }
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(':maCK')
+  @ApiOperation({
+    summary: 'Fetch detailed data of a transaction',
+  })
+  @ApiParam({ name: 'maCK', description: 'Mã chuyển khoản', type: 'number' })
+  @ApiOkResponse({
+    description: 'Successfully return a record of transaction',
+    type: ResponseTransactionDto,
+  })
+  findOne(@Param('maCK', ParseIntPipe) id: number) {
     try {
       return this.transactionsService.findOne(id);
     } catch (e) {
