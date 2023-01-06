@@ -12,7 +12,7 @@ import { formatResponse, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-import { QueryDTO } from './dto/query.dto';
+import { InterbankTransactionQueryDto } from './dto/query.dto';
 
 @Injectable()
 export class InterbankService {
@@ -60,9 +60,13 @@ export class InterbankService {
     }
   }
 
-  async findAllWithPagination(pagination: PaginationDto, query: QueryDTO) {
-    const from = new Date(query.from),
-      to = new Date(query.to);
+  async findAllWithPagination(
+    pagination: PaginationDto,
+    query: InterbankTransactionQueryDto,
+  ) {
+    const from = query.from ? new Date(query.from) : undefined;
+    const to = query.to ? new Date(query.to) : undefined;
+    const maNH = +query.bankID || undefined;
 
     let total;
     try {
@@ -72,7 +76,7 @@ export class InterbankService {
             gte: from,
             lte: to,
           },
-          maNganHang: +query.bankID,
+          maNganHang: maNH,
         },
       });
     } catch (e) {
@@ -86,7 +90,6 @@ export class InterbankService {
       throw e;
     }
     let interbankList;
-    let res = {};
     try {
       const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
         skip: (pagination.page - 1) * pagination.size,
@@ -99,7 +102,7 @@ export class InterbankService {
             gte: from,
             lte: to,
           },
-          maNganHang: +query.bankID,
+          maNganHang: maNH,
         },
       });
       interbankList = data.map(({ ...props }) => ({
@@ -116,7 +119,7 @@ export class InterbankService {
       }
     }
     const lastPage = Math.ceil(total / pagination.size);
-    res = formatResponse(
+    const res = formatResponse(
       pagination,
       total,
       lastPage,
@@ -135,7 +138,7 @@ export class InterbankService {
               gte: from,
               lte: to,
             },
-            maNganHang: +query.bankID,
+            maNganHang: maNH,
           },
         }),
         await this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
@@ -146,7 +149,7 @@ export class InterbankService {
               gte: from,
               lte: to,
             },
-            maNganHang: +query.bankID,
+            maNganHang: maNH,
           },
         }),
       ];

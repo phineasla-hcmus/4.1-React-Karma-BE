@@ -10,7 +10,7 @@ import {
 
 import { Pagination, PaginationDto } from '../pagination';
 
-import { QueryDTO } from './dto/query.dto';
+import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
 @Controller('interbank')
@@ -51,8 +51,10 @@ export class InterbankController {
   @Get()
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
-    @Query() query: QueryDTO,
+    @Query() query: InterbankTransactionQueryDto,
   ) {
+    console.log(query.from);
+
     try {
       return this.interbankService.findAllWithPagination(pagination, query);
     } catch (e) {
