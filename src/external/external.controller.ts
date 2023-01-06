@@ -1,10 +1,12 @@
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
+
 import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { ExternalService } from './external.service';
-import { WrapFindOneAccountResponseDto } from './hcmusbank/dto/find-one-account-response.dto';
+import { FindOneAccountResponseDto } from './hcmusbank/dto/find-one-account-response.dto';
 @ApiTags('external')
 @Controller('external')
 export class ExternalController {
@@ -14,14 +16,14 @@ export class ExternalController {
   @ApiOperation({
     summary: 'Return an account number of HCMUSBank',
   })
-  @ApiOkResponse({
+  @ApiOkWrappedResponse({
     description: 'Successfully get an account number of HCMUSBank',
-    type: WrapFindOneAccountResponseDto,
+    type: FindOneAccountResponseDto,
   })
   async findOneAccount(@Body() findOneAccountDto: FindOneExternalDto) {
     const data = await this.externalService.findOneExternal(findOneAccountDto);
     if (data != null) {
-      return data;
+      return { data };
     }
     throw new NotFoundException({
       errorId: 'bank_not_found',
