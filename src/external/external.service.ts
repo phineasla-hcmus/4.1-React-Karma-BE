@@ -3,7 +3,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -94,15 +93,28 @@ export class ExternalService {
           message: `Cannot find bank with name ${transferDto.nganHang}`,
         });
     }
-    await this.otpService.delete(otp.soTK);
-    // Shouldn't throw P2018 because we already checked payment account and bank are valid
-    return this.transactionService.createExternal({
-      internal: transferDto.soTK,
-      external: transferDto.nguoiNhan,
-      bank: transferDto.nganHang,
-      // Minus indicate a deposit transaction
-      amount: -transferDto.soTien,
-      message: transferDto.noiDung,
+    return this.prismaService.$transaction(async (tx) => {
+      await this.otpService.delete(otp.soTK, tx);
+      // Shouldn't throw P2018 because we already checked payment account and bank are valid
+      const transaction = await this.transactionService.createExternal(
+        {
+          internal: transferDto.soTK,
+          external: transferDto.nguoiNhan,
+          bank: transferDto.nganHang,
+          // Minus indicate a deposit transaction
+          amount: -transferDto.soTien,
+          message: transferDto.noiDung,
+        },
+        tx,
+      );
+      await this.paymentAccountService.decreaseBalance(
+        {
+          soTK: transferDto.soTK,
+          amount: transferDto.soTien,
+        },
+        tx,
+      );
+      return transaction;
     });
   }
 }

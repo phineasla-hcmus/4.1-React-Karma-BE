@@ -6,6 +6,7 @@ import {
 
 import { FEE } from '../constants';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
 
@@ -14,6 +15,7 @@ import { TransferDto } from './dto/transfer.dto';
 @Injectable()
 export class UserService {
   constructor(
+    private prismaService: PrismaService,
     private paymentAccountService: PaymentAccountsService,
     private otpService: TransactionOtpService,
     private transactionService: TransactionsService,
@@ -48,15 +50,34 @@ export class UserService {
         }),
       ),
     );
-    await this.otpService.delete(otp.soTK);
-    // Shouldn't throw P2018 because we already checked payment accounts are valid
-    return await this.transactionService.create({
-      sender: transferDto.soTK,
-      receiver: transferDto.nguoiNhan,
-      amount: transferDto.soTien,
-      message: transferDto.noiDung,
-      fee: FEE,
-      feeType: transferDto.loaiCK,
+    return this.prismaService.$transaction(async (tx) => {
+      await this.otpService.delete(otp.soTK, tx);
+      // Shouldn't throw P2018 because we already checked payment accounts are valid
+      await this.transactionService.create(
+        {
+          sender: transferDto.soTK,
+          receiver: transferDto.nguoiNhan,
+          amount: transferDto.soTien,
+          message: transferDto.noiDung,
+          fee: FEE,
+          feeType: transferDto.loaiCK,
+        },
+        tx,
+      );
+      await this.paymentAccountService.decreaseBalance(
+        {
+          soTK: transferDto.soTK,
+          amount: transferDto.soTien,
+        },
+        tx,
+      );
+      await this.paymentAccountService.increaseBalance(
+        {
+          soTK: transferDto.nguoiNhan,
+          amount: transferDto.soTien,
+        },
+        tx,
+      );
     });
   }
 }

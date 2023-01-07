@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
@@ -176,8 +177,11 @@ export class TransactionsService {
     }
   }
 
-  async create(dto: CreateTransactionDto) {
-    return this.prismaService.chuyenKhoanNoiBo.create({
+  async create(
+    dto: CreateTransactionDto,
+    prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
+  ) {
+    return prismaService.chuyenKhoanNoiBo.create({
       data: {
         taiKhoanChuyen: { connect: { soTK: dto.sender } },
         taiKhoanNhan: { connect: { soTK: dto.receiver } },
@@ -189,8 +193,11 @@ export class TransactionsService {
     });
   }
 
-  async createExternal(dto: CreateExternalTransactionDto) {
-    return this.prismaService.chuyenKhoanNganHangNgoai.create({
+  async createExternal(
+    dto: CreateExternalTransactionDto,
+    prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
+  ) {
+    return prismaService.chuyenKhoanNganHangNgoai.create({
       data: {
         tkNgoai: dto.external,
         soTien: dto.amount,

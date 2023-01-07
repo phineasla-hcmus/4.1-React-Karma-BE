@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+import { UpdateBalanceDto } from './dto/update-balance.dto';
 
 @Injectable()
 export class PaymentAccountsService {
@@ -41,5 +44,33 @@ export class PaymentAccountsService {
       };
     }
     return null;
+  }
+
+  async increaseBalance(
+    { soTK, amount: value }: UpdateBalanceDto,
+    prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
+  ) {
+    return prismaService.taiKhoanThanhToan.update({
+      where: { soTK: soTK },
+      data: {
+        soDu: {
+          increment: value,
+        },
+      },
+    });
+  }
+
+  async decreaseBalance(
+    { soTK, amount: value }: UpdateBalanceDto,
+    prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
+  ) {
+    return prismaService.taiKhoanThanhToan.update({
+      where: { soTK: soTK },
+      data: {
+        soDu: {
+          decrement: value,
+        },
+      },
+    });
   }
 }
