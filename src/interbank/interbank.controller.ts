@@ -16,9 +16,15 @@ import {
 } from '@nestjs/swagger';
 
 import { Pagination, PaginationDto } from '../pagination';
-import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
+import {
+  ApiOkWrappedResponse,
+  ApiPaginatedResponse,
+} from '../swagger/swagger.decorator';
 
-import { InterbankResponseDto } from './dto/interbank.response.dto';
+import {
+  InterbankResponseDto,
+  InterbankTransferResponseDto,
+} from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
@@ -61,11 +67,10 @@ export class InterbankController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of interbank transfer',
   })
-  // @ApiWrapResponse(BankerResponseDto)
-  @ApiOkResponse({
+  @ApiOkWrappedResponse({
     description:
       'Successfully received a non-paginated list of interbank transfer',
-    // type: [BankerResponseDto],
+    type: InterbankTransferResponseDto,
   })
   async findAllWithoutPagination() {
     try {
@@ -81,7 +86,7 @@ export class InterbankController {
   @ApiOperation({
     summary: 'Fetch a paginated list of interbank transfer',
   })
-  // @ApiPaginatedResponse(BankerResponseDto)
+  @ApiPaginatedResponse({ type: InterbankTransferResponseDto })
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: InterbankTransactionQueryDto,
@@ -107,7 +112,7 @@ export class InterbankController {
   })
   @ApiOkResponse({
     description: 'Successfully fetched a record of interbank transfer',
-    // type: UpdateBankerResponseDto,
+    type: InterbankTransferResponseDto,
   })
   findOne(@Param('maCKN', ParseIntPipe) id: number) {
     try {
