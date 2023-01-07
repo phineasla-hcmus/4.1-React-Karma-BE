@@ -16,12 +16,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { Pagination, PaginationDto } from '../pagination';
 import {
+  ApiOkWrappedResponse,
   ApiPaginatedResponse,
-  ApiWrapResponse,
-  Pagination,
-  PaginationDto,
-} from '../pagination';
+} from '../swagger/swagger.decorator';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -57,7 +56,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of users',
   })
-  @ApiWrapResponse(UserResponseDto)
+  @ApiOkWrappedResponse({ type: UserResponseDto })
   async findAllWithoutPagination(@Body() res: UserResponseDto) {
     try {
       const data = await this.usersService.findAllWithoutPagination();
@@ -71,7 +70,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Fetch a paginated list of users',
   })
-  @ApiPaginatedResponse(UserResponseDto)
+  @ApiPaginatedResponse({ type: UserResponseDto })
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
       const data = await this.usersService.findAllWithPagination(pagination);

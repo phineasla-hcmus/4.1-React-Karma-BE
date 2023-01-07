@@ -18,12 +18,11 @@ import {
 } from '@nestjs/swagger';
 
 import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
+import { Pagination, PaginationDto } from '../pagination';
 import {
+  ApiOkWrappedResponse,
   ApiPaginatedResponse,
-  ApiWrapResponse,
-  Pagination,
-  PaginationDto,
-} from '../pagination';
+} from '../swagger/swagger.decorator';
 
 import { RequestTransactionDto } from './dto/request-transaction.dto';
 import { ResponseTransactionDto } from './dto/transaction.response.dto';
@@ -81,7 +80,7 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of transactions',
   })
-  @ApiWrapResponse(ResponseTransactionDto)
+  @ApiOkWrappedResponse({ type: ResponseTransactionDto })
   async findAllWithoutPagination(@Body() res: ResponseTransactionDto) {
     try {
       const data = await this.transactionsService.findAllWithoutPagination();
@@ -95,7 +94,7 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Fetch a paginated list of transactions',
   })
-  @ApiPaginatedResponse(ResponseTransactionDto)
+  @ApiPaginatedResponse({ type: ResponseTransactionDto })
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: TransactionQueryDTO,

@@ -8,6 +8,8 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiExcludeController,
+  ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -15,17 +17,11 @@ import {
 } from '@nestjs/swagger';
 
 import { BankerResponseDto } from '../bankers/dto/banker.response.dto';
-import {
-  ApiPaginatedResponse,
-  ApiWrapResponse,
-  Pagination,
-  PaginationDto,
-} from '../pagination';
+import { Pagination, PaginationDto } from '../pagination';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
-@ApiTags('interbank')
 @Controller('interbank')
 export class InterbankController {
   constructor(private interbankService: InterbankService) {}
@@ -34,6 +30,7 @@ export class InterbankController {
   @ApiOperation({
     summary: '',
   })
+  @ApiTags('API cho liên ngân hàng')
   @ApiOkResponse({
     description: '',
   })
@@ -58,6 +55,7 @@ export class InterbankController {
   }
 
   @Get('all')
+  @ApiTags('interbank')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of interbank transfer',
   })
@@ -77,6 +75,7 @@ export class InterbankController {
   }
 
   @Get()
+  @ApiTags('interbank')
   @ApiOperation({
     summary: 'Fetch a paginated list of interbank transfer',
   })
@@ -94,22 +93,8 @@ export class InterbankController {
     }
   }
 
-  @Get('statistic')
-  // @ApiOperation({
-  //   summary: 'Update detail info of a banker',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Successfully updated a record of banker',
-  // })
-  findStatistic() {
-    try {
-      return this.interbankService.findStatistic();
-    } catch (e) {
-      throw e;
-    }
-  }
-
   @Get(':maCKN')
+  @ApiTags('interbank')
   @ApiOperation({
     summary: 'Get detail of an interbank transfer',
   })
