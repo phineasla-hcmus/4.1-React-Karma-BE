@@ -18,12 +18,11 @@ import {
 } from '@nestjs/swagger';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
+import { Pagination, PaginationDto } from '../pagination';
 import {
-  ApiPaginatedResponse,
-  ApiWrapResponse,
-  Pagination,
-  PaginationDto,
-} from '../pagination';
+  ApiOkPaginatedResponse,
+  ApiOkWrappedResponse,
+} from '../swagger/swagger.decorator';
 
 import { BankersService } from './bankers.service';
 import {
@@ -35,7 +34,6 @@ import { UpdateBankerDto } from './dto/update-banker.dto';
 
 @ApiTags('bankers')
 @Controller('bankers')
-@ApiExtraModels(PaginationDto)
 export class BankersController {
   constructor(private readonly bankersService: BankersService) {}
 
@@ -59,7 +57,10 @@ export class BankersController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of bankers',
   })
-  @ApiWrapResponse(BankerResponseDto)
+  @ApiOkWrappedResponse({
+    // description: 'Successfully transfer',
+    type: BankerResponseDto,
+  })
   async findAllWithoutPagination() {
     try {
       const data = await this.bankersService.findAllWithoutPagination();
@@ -73,7 +74,7 @@ export class BankersController {
   @ApiOperation({
     summary: 'Fetch a paginated list of bankers',
   })
-  @ApiPaginatedResponse(BankerResponseDto)
+  @ApiOkPaginatedResponse({ type: BankerResponseDto })
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
       const data = await this.bankersService.findAllWithPagination(pagination);

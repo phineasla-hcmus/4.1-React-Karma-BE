@@ -14,8 +14,3 @@ export class FindOneAccountResponseDto {
   @ApiProperty()
   lastName: string;
 }
-
-export class WrapFindOneAccountResponseDto {
-  @ApiProperty()
-  data: FindOneAccountResponseDto;
-}
