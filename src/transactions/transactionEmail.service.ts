@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { ClientsService } from '../clients/clients.service';
 import { EmailService } from '../email/email.service';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TransactionEmailService {
@@ -9,11 +9,11 @@ export class TransactionEmailService {
 
   constructor(
     private readonly emailService: EmailService,
-    private readonly usersService: UsersService,
+    private readonly clientsService: ClientsService,
   ) {}
 
   async sendEmail(soTK: string, otp: number) {
-    const user = await this.usersService.findOneByPaymentAccount(soTK, {
+    const user = await this.clientsService.findOneByPaymentAccount(soTK, {
       include: { khachHang: true },
     });
     const content = `Dear ${user.khachHang.hoTen},

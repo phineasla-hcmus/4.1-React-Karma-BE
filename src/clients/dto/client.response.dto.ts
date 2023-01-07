@@ -31,7 +31,7 @@ class AccountInfo {
   hoatDong: boolean;
 }
 
-export class CreateUserResponseDto {
+export class CreateClientResponseDto {
   @ApiProperty()
   maTK: number;
 
@@ -60,7 +60,7 @@ export class CreateUserResponseDto {
   id: number;
 }
 
-export class UserResponseDto {
+export class ClientResponseDto {
   @ApiProperty()
   maTK: number;
 
@@ -86,7 +86,7 @@ export class UserResponseDto {
   khachHang: ClientInfo;
 }
 
-export class UpdateUserResponseDto {
+export class UpdateClientResponseDto {
   @ApiProperty()
   id: number;
 

@@ -22,31 +22,31 @@ import {
   ApiPaginatedResponse,
 } from '../swagger/swagger.decorator';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ClientsService } from './clients.service';
 import {
-  CreateUserResponseDto,
-  UpdateUserResponseDto,
-  UserResponseDto,
-} from './dto/user.response.dto';
-import { UsersService } from './users.service';
+  CreateClientResponseDto,
+  UpdateClientResponseDto,
+  ClientResponseDto,
+} from './dto/client.response.dto';
+import { CreateUserDto } from './dto/create-client.dto';
+import { UpdateUserDto } from './dto/update-client.dto';
 
-@ApiTags('users')
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+@ApiTags('clients')
+@Controller('clients')
+export class ClientsController {
+  constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
   @ApiOperation({
-    summary: 'Create a user',
+    summary: 'Create a client',
   })
   @ApiOkResponse({
-    description: 'Return information of the created user',
-    type: CreateUserResponseDto,
+    description: 'Return information of the created client',
+    type: CreateClientResponseDto,
   })
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-      return await this.usersService.create(createUserDto);
+      return await this.clientsService.create(createUserDto);
     } catch (e) {
       throw e;
     }
@@ -54,12 +54,12 @@ export class UsersController {
 
   @Get('all')
   @ApiOperation({
-    summary: 'Fetch a non-paginated list of users',
+    summary: 'Fetch a non-paginated list of clients',
   })
-  @ApiOkWrappedResponse({ type: UserResponseDto })
-  async findAllWithoutPagination(@Body() res: UserResponseDto) {
+  @ApiOkWrappedResponse({ type: ClientResponseDto })
+  async findAllWithoutPagination(@Body() res: ClientResponseDto) {
     try {
-      const data = await this.usersService.findAllWithoutPagination();
+      const data = await this.clientsService.findAllWithoutPagination();
       return { data };
     } catch (e) {
       throw e;
@@ -68,12 +68,12 @@ export class UsersController {
 
   @Get()
   @ApiOperation({
-    summary: 'Fetch a paginated list of users',
+    summary: 'Fetch a paginated list of clients',
   })
-  @ApiPaginatedResponse({ type: UserResponseDto })
+  @ApiPaginatedResponse({ type: ClientResponseDto })
   async findAllWithPagination(@Pagination() pagination: PaginationDto) {
     try {
-      const data = await this.usersService.findAllWithPagination(pagination);
+      const data = await this.clientsService.findAllWithPagination(pagination);
       return data;
     } catch (e) {
       throw e;
@@ -87,11 +87,11 @@ export class UsersController {
   @ApiParam({ name: 'maTK', description: 'Mã tài khoản', type: 'number' })
   @ApiOkResponse({
     description: 'Successfully return a record of user',
-    type: UserResponseDto,
+    type: ClientResponseDto,
   })
   findOne(@Param('maTK', ParseIntPipe) id: number) {
     try {
-      return this.usersService.findOne(id);
+      return this.clientsService.findOne(id);
     } catch (e) {
       throw e;
     }
@@ -104,13 +104,13 @@ export class UsersController {
   @ApiParam({ name: 'maTK', description: 'Mã tài khoản', type: 'number' })
   @ApiOkResponse({
     description: 'Successfully updated a record of user',
-    type: UpdateUserResponseDto,
+    type: UpdateClientResponseDto,
   })
   update(
     @Param('maTK', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return this.clientsService.update(id, updateUserDto);
   }
 
   @Delete(':maTK')
@@ -122,7 +122,7 @@ export class UsersController {
     description: 'Successfully deleted a record of user',
   })
   async remove(@Param('maTK') id: string) {
-    await this.usersService.remove(+id);
+    await this.clientsService.remove(+id);
     return { data: { status: HttpStatus.OK } };
   }
 }
