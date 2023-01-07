@@ -9,12 +9,25 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
 import { Pagination, PaginationDto } from '../pagination';
+import {
+  ApiOkWrappedResponse,
+  ApiPaginatedResponse,
+} from '../swagger/swagger.decorator';
 
 import { RequestTransactionDto } from './dto/request-transaction.dto';
+import { ResponseTransactionDto } from './dto/transaction.response.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
@@ -30,6 +43,14 @@ export class TransactionsController {
   ) {}
 
   @Post('request')
+  @ApiOperation({
+    summary: 'Request an OTP before transfer',
+  })
+  @ApiBody({ type: RequestTransactionDto })
+  @ApiResponse({
+    description: 'Return an OTP in the email',
+    status: 201,
+  })
   async requestTransaction({ soTK, nguoiNhan, soTien }: RequestTransactionDto) {
     const otp = await this.transactionOtpService.findOne(soTK).catch(() => {
       throw new InternalServerErrorException({
@@ -59,6 +80,10 @@ export class TransactionsController {
   }
 
   @Get('all')
+  @ApiOperation({
+    summary: 'Fetch a non-paginated list of transactions',
+  })
+  @ApiOkWrappedResponse({ type: ResponseTransactionDto })
   async findAllWithoutPagination() {
     try {
       const data = await this.transactionsService.findAllWithoutPagination();
@@ -69,6 +94,22 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Fetch a paginated list of transactions',
+  })
+  @ApiQuery({
+    name: 'sender',
+    type: 'string',
+    description: 'Account number of a sender',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'receiver',
+    type: 'string',
+    description: 'Account number of a receiver',
+    required: false,
+  })
+  @ApiPaginatedResponse({ type: ResponseTransactionDto })
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: TransactionQueryDTO,
@@ -80,8 +121,16 @@ export class TransactionsController {
     }
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(':maCK')
+  @ApiOperation({
+    summary: 'Fetch detailed data of a transaction',
+  })
+  @ApiParam({ name: 'maCK', description: 'Mã chuyển khoản', type: 'number' })
+  @ApiOkResponse({
+    description: 'Successfully return a record of transaction',
+    type: ResponseTransactionDto,
+  })
+  findOne(@Param('maCK', ParseIntPipe) id: number) {
     try {
       return this.transactionsService.findOne(id);
     } catch (e) {

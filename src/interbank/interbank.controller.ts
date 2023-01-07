@@ -7,20 +7,36 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { Pagination, PaginationDto } from '../pagination';
+import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
+import { InterbankResponseDto } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
-@ApiTags('interbank')
 @Controller('interbank')
 export class InterbankController {
   constructor(private interbankService: InterbankService) {}
 
   @Get('account')
-  async getAccount(@Query('account_no') account_no: string) {
+  @ApiOperation({
+    summary: 'Fetch an interbank account info',
+  })
+  @ApiTags('API cho liên ngân hàng')
+  @ApiOkWrappedResponse({
+    type: InterbankResponseDto,
+    description: 'Successfully fetched an interbank account info',
+  })
+  @ApiQuery({ name: 'soTK', type: 'string' })
+  async getAccount(@Query('soTK') account_no: string) {
     if (account_no) {
       const user = await this.interbankService.getPaymentAccountInfo(
         account_no,
@@ -41,6 +57,16 @@ export class InterbankController {
   }
 
   @Get('all')
+  @ApiTags('interbank')
+  @ApiOperation({
+    summary: 'Fetch a non-paginated list of interbank transfer',
+  })
+  // @ApiWrapResponse(BankerResponseDto)
+  @ApiOkResponse({
+    description:
+      'Successfully received a non-paginated list of interbank transfer',
+    // type: [BankerResponseDto],
+  })
   async findAllWithoutPagination() {
     try {
       const data = await this.interbankService.findAllWithoutPagination();
@@ -51,6 +77,11 @@ export class InterbankController {
   }
 
   @Get()
+  @ApiTags('interbank')
+  @ApiOperation({
+    summary: 'Fetch a paginated list of interbank transfer',
+  })
+  // @ApiPaginatedResponse(BankerResponseDto)
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: InterbankTransactionQueryDto,
@@ -64,17 +95,21 @@ export class InterbankController {
     }
   }
 
-  @Get('statistic')
-  findStatistic() {
-    try {
-      return this.interbankService.findStatistic();
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(':maCKN')
+  @ApiTags('interbank')
+  @ApiOperation({
+    summary: 'Get detail of an interbank transfer',
+  })
+  @ApiParam({
+    name: 'maCKN',
+    description: 'Mã chuyển khoản ngoài',
+    type: 'number',
+  })
+  @ApiOkResponse({
+    description: 'Successfully fetched a record of interbank transfer',
+    // type: UpdateBankerResponseDto,
+  })
+  findOne(@Param('maCKN', ParseIntPipe) id: number) {
     try {
       return this.interbankService.findOne(id);
     } catch (e) {

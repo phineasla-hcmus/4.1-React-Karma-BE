@@ -15,12 +15,12 @@ import * as bcrypt from 'bcrypt';
 import { formatResponse, PaginationDto } from '../pagination';
 import { PrismaService } from '../prisma/prisma.service';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-client.dto';
+import { UpdateUserDto } from './dto/update-client.dto';
 
 @Injectable()
-export class UsersService {
-  private readonly logger: Logger = new Logger(UsersService.name);
+export class ClientsService {
+  private readonly logger: Logger = new Logger(ClientsService.name);
 
   constructor(private prismaService: PrismaService) {}
 
@@ -151,7 +151,7 @@ export class UsersService {
     }
     const lastPage = Math.ceil(total / pagination.size);
 
-    return formatResponse(pagination, total, lastPage, userList, 'users');
+    return formatResponse(pagination, total, lastPage, userList, 'clients');
   }
 
   /**

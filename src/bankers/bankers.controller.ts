@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { type } from 'os';
-
 import {
   Controller,
   Get,
@@ -21,7 +18,10 @@ import {
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
 import { Pagination, PaginationDto } from '../pagination';
-import { ApiOkPaginatedResponse } from '../swagger/swagger.decorator';
+import {
+  ApiOkPaginatedResponse,
+  ApiOkWrappedResponse,
+} from '../swagger/swagger.decorator';
 
 import { BankersService } from './bankers.service';
 import {
@@ -56,11 +56,11 @@ export class BankersController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of bankers',
   })
-  @ApiOkResponse({
-    description: 'Successfully received a non-paginated list of bankers',
-    type: [BankerResponseDto],
+  @ApiOkWrappedResponse({
+    // description: 'Successfully transfer',
+    type: BankerResponseDto,
   })
-  async findAllWithoutPagination(@Body() createBankerDto: BankerResponseDto) {
+  async findAllWithoutPagination() {
     try {
       const data = await this.bankersService.findAllWithoutPagination();
       return { data };
@@ -95,7 +95,6 @@ export class BankersController {
   findOne(
     @Param('maTK', ParseIntPipe)
     id: number,
-    @Body() createBankerDto: BankerResponseDto,
   ) {
     try {
       return this.bankersService.findOne(id);
