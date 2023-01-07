@@ -85,6 +85,7 @@ export class ClientsService {
         },
         include: {
           khachHang: true,
+          taiKhoanThanhToan: true,
         },
       });
 
@@ -133,6 +134,7 @@ export class ClientsService {
         },
         include: {
           khachHang: true,
+          taiKhoanThanhToan: true,
         },
       });
 
@@ -167,6 +169,7 @@ export class ClientsService {
         },
         include: {
           khachHang: true,
+          taiKhoanThanhToan: true,
         },
       });
       user = { id: data.maTK, ...data };
