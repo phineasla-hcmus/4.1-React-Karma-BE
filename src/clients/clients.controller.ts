@@ -56,7 +56,7 @@ export class ClientsController {
   @ApiOperation({
     summary: 'Fetch a non-paginated list of clients',
   })
-  @ApiOkWrappedResponse({ type: ClientResponseDto })
+  @ApiOkWrappedResponse({ type: ClientResponseDto, isArray: true })
   async findAllWithoutPagination(@Body() res: ClientResponseDto) {
     try {
       const data = await this.clientsService.findAllWithoutPagination();

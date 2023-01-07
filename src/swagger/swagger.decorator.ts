@@ -9,21 +9,27 @@ import {
 import { PaginationDto } from '../pagination';
 
 export interface ApiWrappedResponseMetadata
-  extends Omit<ApiResponseMetadata, 'type' | 'isArray'> {
+  extends Omit<ApiResponseMetadata, 'type'> {
   type: Type<unknown>;
 }
 
 export const ApiWrappedResponse = (options: ApiWrappedResponseMetadata) => {
-  const { type, ...omitted } = options;
+  const { type, isArray, ...omitted } = options;
   return applyDecorators(
     ApiExtraModels(type),
     ApiResponse({
       ...omitted,
       schema: {
         properties: {
-          data: {
-            $ref: getSchemaPath(type),
-          },
+          data: isArray
+            ? {
+                type: 'array',
+                items: { $ref: getSchemaPath(type) },
+              }
+            : {
+                type: 'object',
+                $ref: getSchemaPath(type),
+              },
         },
       },
     }),

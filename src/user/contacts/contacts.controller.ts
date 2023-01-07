@@ -8,19 +8,30 @@ import {
   Delete,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { JwtUser } from '../../jwt/jwt.decorator';
 import { JwtUserDto } from '../../jwt/jwt.dto';
+import {
+  ApiCreatedWrappedResponse,
+  ApiOkWrappedResponse,
+} from '../../swagger/swagger.decorator';
 
 import { ContactsService } from './contacts.service';
+import { ContactResponseDto } from './dto/contact.response.dto';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
+@ApiTags('user/contacts')
 @Controller('contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 
   @Get('all')
+  @ApiOperation({
+    summary: 'Fetch a non-paginated list of contacts',
+  })
+  @ApiOkWrappedResponse({ type: ContactResponseDto, isArray: true })
   async findAllWithoutPagination(@JwtUser() user: JwtUserDto) {
     const { maTK } = user;
     const data = await this.contactsService.findAllWithoutPagination(maTK);
@@ -28,6 +39,10 @@ export class ContactsController {
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Create new contact',
+  })
+  @ApiCreatedWrappedResponse({ type: ContactResponseDto })
   async create(
     @JwtUser() user: JwtUserDto,
     @Body() createContactsDto: CreateContactDto,
@@ -38,6 +53,7 @@ export class ContactsController {
   }
 
   @Patch(':nguoiDung')
+  @ApiOkWrappedResponse({ type: ContactResponseDto })
   async update(
     @JwtUser() user: JwtUserDto,
     @Param('nguoiDung') nguoiDung: string,
@@ -62,7 +78,8 @@ export class ContactsController {
     return { data };
   }
 
-  @Delete(':id')
+  @Delete(':nguoiDung')
+  @ApiOkWrappedResponse({ type: ContactResponseDto })
   async remove(
     @JwtUser() user: JwtUserDto,
     @Param('nguoiDung') nguoiDung: string,
