@@ -28,3 +28,11 @@ export class ResponseTransactionDto {
   @ApiProperty()
   id: number;
 }
+
+export class ResponseRequestDto {
+  @ApiProperty()
+  soTK: string;
+
+  @ApiProperty()
+  soTien: number;
+}

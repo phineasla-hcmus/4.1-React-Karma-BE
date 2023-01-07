@@ -8,17 +8,17 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiExcludeController,
-  ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 
-import { BankerResponseDto } from '../bankers/dto/banker.response.dto';
 import { Pagination, PaginationDto } from '../pagination';
+import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
+import { InterbankResponseDto } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
@@ -28,13 +28,15 @@ export class InterbankController {
 
   @Get('account')
   @ApiOperation({
-    summary: '',
+    summary: 'Fetch an interbank account info',
   })
   @ApiTags('API cho liên ngân hàng')
-  @ApiOkResponse({
-    description: '',
+  @ApiOkWrappedResponse({
+    type: InterbankResponseDto,
+    description: 'Successfully fetched an interbank account info',
   })
-  async getAccount(@Query('account_no') account_no: string) {
+  @ApiQuery({ name: 'soTK', type: 'string' })
+  async getAccount(@Query('soTK') account_no: string) {
     if (account_no) {
       const user = await this.interbankService.getPaymentAccountInfo(
         account_no,

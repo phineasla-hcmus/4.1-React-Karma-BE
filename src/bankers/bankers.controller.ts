@@ -10,7 +10,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -96,7 +95,6 @@ export class BankersController {
   findOne(
     @Param('maTK', ParseIntPipe)
     id: number,
-    @Body() createBankerDto: BankerResponseDto,
   ) {
     try {
       return this.bankersService.findOne(id);

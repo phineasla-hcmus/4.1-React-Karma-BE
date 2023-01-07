@@ -8,12 +8,14 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Body,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -41,13 +43,14 @@ export class TransactionsController {
   ) {}
 
   @Post('request')
-  // @ApiOperation({
-  //   summary: 'Create a banker',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Return information of the created banker',
-  //   type: BankerResponseDto,
-  // })
+  @ApiOperation({
+    summary: 'Request an OTP before transfer',
+  })
+  @ApiBody({ type: RequestTransactionDto })
+  @ApiResponse({
+    description: 'Return an OTP in the email',
+    status: 201,
+  })
   async requestTransaction({ soTK, nguoiNhan, soTien }: RequestTransactionDto) {
     const otp = await this.transactionOtpService.findOne(soTK).catch(() => {
       throw new InternalServerErrorException({
@@ -81,7 +84,7 @@ export class TransactionsController {
     summary: 'Fetch a non-paginated list of transactions',
   })
   @ApiOkWrappedResponse({ type: ResponseTransactionDto })
-  async findAllWithoutPagination(@Body() res: ResponseTransactionDto) {
+  async findAllWithoutPagination() {
     try {
       const data = await this.transactionsService.findAllWithoutPagination();
       return { data };
@@ -93,6 +96,18 @@ export class TransactionsController {
   @Get()
   @ApiOperation({
     summary: 'Fetch a paginated list of transactions',
+  })
+  @ApiQuery({
+    name: 'sender',
+    type: 'string',
+    description: 'Account number of a sender',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'receiver',
+    type: 'string',
+    description: 'Account number of a receiver',
+    required: false,
   })
   @ApiPaginatedResponse({ type: ResponseTransactionDto })
   async findAllWithPagination(
