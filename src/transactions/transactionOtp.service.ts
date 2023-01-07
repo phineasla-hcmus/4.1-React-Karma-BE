@@ -39,6 +39,8 @@ export class TransactionOtpService {
 
   verify(target: Omit<otpChuyenKhoan, 'ngayTao'>, source: otpChuyenKhoan) {
     return (
+      target &&
+      source &&
       target.otp === source.otp &&
       Date.now() - source.ngayTao.getTime() < TRANSACTION_OTP_TTL &&
       target.soTK === source.soTK &&
