@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { otpChuyenKhoan } from '@prisma/client';
+import { otpChuyenKhoan, Prisma, PrismaClient } from '@prisma/client';
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
@@ -24,7 +24,7 @@ export class TransactionOtpService {
     } else {
       this.logger.error(e);
     }
-    throw e;
+    return e;
   }
 
   async findOne(soTK: string) {
@@ -57,15 +57,18 @@ export class TransactionOtpService {
         create: { ...data, otp },
       });
     } catch (e) {
-      this.didReceiveError(e);
+      throw this.didReceiveError(e);
     }
   }
 
-  async delete(soTK: string) {
+  async delete(
+    soTK: string,
+    prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
+  ) {
     try {
-      return this.prismaService.otpChuyenKhoan.delete({ where: { soTK } });
+      return prismaService.otpChuyenKhoan.delete({ where: { soTK } });
     } catch (e) {
-      this.didReceiveError(e);
+      throw this.didReceiveError(e);
     }
   }
 }
