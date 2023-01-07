@@ -1,4 +1,20 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
-@Controller('paymentAccounts')
-export class PaymentAccountsController {}
+import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
+
+import { FindOnePaymentAccountResponseDto as FindOnePaymentAccountInfoResponseDto } from './dto/find-one-payment-account-info.response.dto';
+import { PaymentAccountsService } from './paymentAccounts.service';
+
+@Controller('payment-accounts')
+export class PaymentAccountsController {
+  constructor(private paymentAccountsService: PaymentAccountsService) {}
+
+  @Get(':soTK')
+  @ApiOperation({ summary: 'Get fullname of the payment account owner' })
+  @ApiOkWrappedResponse({ type: FindOnePaymentAccountInfoResponseDto })
+  async findOne(@Param('soTK') soTK: string) {
+    const data = await this.paymentAccountsService.findOneInfo(soTK);
+    return { data };
+  }
+}
