@@ -11,7 +11,7 @@ export class PaymentAccountsController {
   constructor(private paymentAccountsService: PaymentAccountsService) {}
 
   @Get(':soTK')
-  @ApiOperation({ summary: 'Get fullname of the payment account owner' })
+  @ApiOperation({ summary: 'Get full name of the payment account owner' })
   @ApiOkWrappedResponse({ type: FindOnePaymentAccountInfoResponseDto })
   async findOne(@Param('soTK') soTK: string) {
     const data = await this.paymentAccountsService.findOneInfo(soTK);

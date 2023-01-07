@@ -26,8 +26,8 @@ model chuyenKhoanNoiBo {
 model danhSachDaLuu {
   maTK              Int               @map("MATK")
   nguoiDung         String            @map("NGUOIDUNG") @db.VarChar(12)
-  tenGoiNho         String            @map("TENGOINHO") @db.VarChar(20)
-  taiKhoanChuDS     taiKhoan          @relation("DANHSACHDALUU_MATKToTAIKHOAN", fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHDALUU1_TAIKHOAN")
+  tenGoiNho         String            @map("TENGOINHO") @db.VarChar(30)
+  taiKhoanChuDS     taiKhoan          @relation("DANHSACHDALUU_MATKToTAIKHOAN", fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHDALUU_TAIKHOAN")
   taiKhoanNguoiDung taiKhoanThanhToan @relation("DANHSACHDALUU_NGUOIDUNGToTAIKHOANTHANHTOAN", fields: [nguoiDung], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHDALUU2_TAIKHOANTHANHTOAN")
 
   @@id([maTK, nguoiDung])
@@ -37,11 +37,14 @@ model danhSachDaLuu {
 model danhSachNgoaiDaLuu {
   maTK            Int             @map("MATK")
   nguoiDung       String          @map("NGUOIDUNG") @db.VarChar(20)
-  tenGoiNho       String          @map("TENGOINHO") @db.VarChar(20)
+  tenGoiNho       String          @map("TENGOINHO") @db.VarChar(30)
   maNH            Int             @map("MANH")
+  taiKhoanChuDS   taiKhoan        @relation("DANHSACHNGOAIDALUU_MATKToTAIKHOAN", fields: [maTK], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHNGOAIDALUU_TAIKHOAN")
   nganHangLienKet nganHangLienKet @relation("DANHSACHNGOAIDALUU_MANHToNGANHANGLIENKET", fields: [maNH], references: [maNH], onDelete: NoAction, onUpdate: NoAction, map: "FK_DANHSACHNGOAIDALUU_NGANHANGLIENKET")
+  taiKhoan        taiKhoan?       @relation(fields: [taiKhoanMaTK], references: [maTK])
+  taiKhoanMaTK    Int?
 
-  @@id([maTK, maNH])
+  @@id([maTK, nguoiDung])
   @@map("DANHSACHNGOAIDALUU")
 }
 
@@ -127,18 +130,20 @@ model nhanVien {
 }
 
 model taiKhoan {
-  maTK              Int                @id @default(autoincrement()) @map("MATK")
-  tenDangNhap       String             @unique @map("TENDANGNHAP") @db.VarChar(8)
-  matKhau           String             @map("MATKHAU") @db.VarChar(100)
-  vaiTro            vaitro             @map("VAITRO")
-  refreshToken      String?            @map("REFRESHTOKEN") @db.VarChar(256)
-  dsTaiKhoan        danhSachDaLuu[]    @relation("DANHSACHDALUU_MATKToTAIKHOAN")
-  dsNhanNo          nhacNo[]           @relation("NHACNO_NGUOIGUIToTAIKHOAN")
-  duocNhacNo        nhacNo[]           @relation("NHACNO_NGUOINHANToTAIKHOAN")
-  nhanVien          nhanVien?
-  taiKhoanThanhToan taiKhoanThanhToan?
-  khachHang         khachHang?
-  hoatDong          Boolean            @default(true) @map("HOATDONG")
+  maTK               Int                  @id @default(autoincrement()) @map("MATK")
+  tenDangNhap        String               @unique @map("TENDANGNHAP") @db.VarChar(8)
+  matKhau            String               @map("MATKHAU") @db.VarChar(100)
+  vaiTro             VaiTro               @map("VAITRO")
+  refreshToken       String?              @map("REFRESHTOKEN") @db.VarChar(256)
+  dsTaiKhoan         danhSachDaLuu[]      @relation("DANHSACHDALUU_MATKToTAIKHOAN")
+  dsTaiKhoanNgoai    danhSachNgoaiDaLuu[] @relation("DANHSACHNGOAIDALUU_MATKToTAIKHOAN")
+  dsNhanNo           nhacNo[]             @relation("NHACNO_NGUOIGUIToTAIKHOAN")
+  duocNhacNo         nhacNo[]             @relation("NHACNO_NGUOINHANToTAIKHOAN")
+  nhanVien           nhanVien?
+  taiKhoanThanhToan  taiKhoanThanhToan?
+  khachHang          khachHang?
+  hoatDong           Boolean              @default(true) @map("HOATDONG")
+  danhSachNgoaiDaLuu danhSachNgoaiDaLuu[]
 
   @@map("TAIKHOAN")
 }
@@ -176,7 +181,7 @@ enum LoaiCK {
   receiver
 }
 
-enum vaitro {
+enum VaiTro {
   Admin
   User
   Banker
