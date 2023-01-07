@@ -37,7 +37,7 @@ export class AuthService {
         message: 'Access Denied',
       });
 
-    const tokens = await this.getToken(
+    const tokens = await this.getTokens(
       account.maTK,
       account.tenDangNhap,
       account.vaiTro,
@@ -62,7 +62,37 @@ export class AuthService {
     });
   }
 
-  async getToken(
+  async refreshTokens(maTK: number, rt: string) {
+    const account = await this.prismaService.taiKhoan.findFirst({
+      where: {
+        maTK: maTK,
+        hoatDong: true,
+      },
+    });
+    if (!account)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Access Denied',
+      });
+    const hoTen = await this.getName(maTK, account.vaiTro);
+    const rtMatch = await bcrypt.compare(rt, account.refreshToken);
+    if (!rtMatch)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Access Denied',
+      });
+
+    const tokens = await this.getTokens(
+      maTK,
+      account.tenDangNhap,
+      account.vaiTro,
+      hoTen,
+    );
+    await this.saveRtHash(maTK, tokens.refreshToken);
+    return tokens;
+  }
+
+  async getTokens(
     maTK: number,
     tenDangNhap: string,
     vaiTro: VaiTro,
