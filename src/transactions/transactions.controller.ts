@@ -8,6 +8,8 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  BadRequestException,
+  Body,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -51,7 +53,15 @@ export class TransactionsController {
     description: 'Return an OTP in the email',
     status: 201,
   })
-  async requestTransaction({ soTK, nguoiNhan, soTien }: RequestTransactionDto) {
+  async requestTransaction(
+    @Body() { soTK, nguoiNhan, soTien }: RequestTransactionDto,
+  ) {
+    if (soTK === nguoiNhan) {
+      throw new BadRequestException({
+        errorId: 'same_account_transaction',
+        message: "You can't transfer to the same account",
+      });
+    }
     const otp = await this.transactionOtpService.findOne(soTK).catch(() => {
       throw new InternalServerErrorException({
         errorId: 'database_error',

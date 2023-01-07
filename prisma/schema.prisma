@@ -78,7 +78,7 @@ model otpChuyenKhoan {
   nguoiNhan String            @map("NGUOINHAN") @db.VarChar(20)
   soTien    Int               @map("SOTIEN")
   otp       Int               @map("OTP")
-  ngayTao   DateTime          @default(now()) @map("NGAYTAO") @db.Date
+  ngayTao   DateTime          @default(now()) @map("NGAYTAO")
   taiKhoan  taiKhoanThanhToan @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHUYENKHOANNGOAI_TAIKHOANTHANHTOAN")
 
   @@map("OTPCHUYENKHOAN")
