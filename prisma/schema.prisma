@@ -101,10 +101,10 @@ model nhacNo {
   nguoiGui          Int               @map("NGUOIGUI")
   nguoiNhan         Int               @map("NGUOINHAN")
   soTien            Int               @map("SOTIEN")
-  ngayTao           DateTime          @default(now()) @map("NGAYTAO") @db.Date
+  ngayTao           DateTime          @default(now()) @map("NGAYTAO")
   noiDungNN         String?           @map("NOIDUNGNN")
   trangThai         Boolean           @default(true) @map("TRANGTHAI")
-  ngayThanhToan     DateTime?         @map("NGAYTHANHTOAN") @db.Date
+  ngayThanhToan     DateTime?         @map("NGAYTHANHTOAN")
   daThanhToan       Boolean           @map("DATHANHTOAN")
   noiDungXoa        String?           @map("NOIDUNGXOA")
   chuyenKhoan       Int?              @unique @map("CHUYENKHOAN")
