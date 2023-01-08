@@ -101,19 +101,21 @@ model nganHangLienKet {
 
 model nhacNo {
   maNN              Int               @id @default(autoincrement()) @map("MANN")
+  // Reminder author
   nguoiGui          Int               @map("NGUOIGUI")
+  soTKNguoiGui      String            @map("SOTKNGUOIGUI")
   nguoiNhan         Int               @map("NGUOINHAN")
   soTien            Int               @map("SOTIEN")
   ngayTao           DateTime          @default(now()) @map("NGAYTAO")
   noiDungNN         String?           @map("NOIDUNGNN")
-  trangThai         Boolean           @default(true) @map("TRANGTHAI")
+  trangThai         TrangThaiNhacNo   @default(pending) @map("TRANGTHAI")
   ngayThanhToan     DateTime?         @map("NGAYTHANHTOAN")
-  daThanhToan       Boolean           @map("DATHANHTOAN")
   noiDungXoa        String?           @map("NOIDUNGXOA")
   chuyenKhoan       Int?              @unique @map("CHUYENKHOAN")
   giaoDichLienKet   chuyenKhoanNoiBo? @relation("NHACNO_GIAODICHLIENKET", fields: [chuyenKhoan], references: [maCK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO_CHUYENKHOANNOIBO")
   taiKhoanNguoiGui  taiKhoan          @relation("NHACNO_NGUOIGUIToTAIKHOAN", fields: [nguoiGui], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO1_TAIKHOAN")
-  taiKhoanNguoiNhan taiKhoan          @relation("NHACNO_NGUOINHANToTAIKHOAN", fields: [nguoiNhan], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO2_TAIKHOAN")
+  taiKhoanThanhToan taiKhoanThanhToan @relation("NHACNO_SOTKNGUOIGUIToTAIKHOANTHANHTOAN", fields: [soTKNguoiGui], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO2_TAIKHOANTHANHTOAN")
+  taiKhoanNguoiNhan taiKhoan          @relation("NHACNO_NGUOINHANToTAIKHOAN", fields: [nguoiNhan], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO3_TAIKHOAN")
 
   @@map("NHACNO")
 }
@@ -160,6 +162,7 @@ model taiKhoanThanhToan {
   lichSuNapTien            lichSuNapTien[]
   thuocDanhSach            danhSachDaLuu[]            @relation("DANHSACHDALUU_NGUOIDUNGToTAIKHOANTHANHTOAN")
   otpChuyenKhoan           otpChuyenKhoan[]
+  nhacNo                   nhacNo[]                   @relation("NHACNO_SOTKNGUOIGUIToTAIKHOANTHANHTOAN")
 
   @@map("TAIKHOANTHANHTOAN")
 }
@@ -174,6 +177,12 @@ model lichSuNapTien {
   taiKhoanThanhToan taiKhoanThanhToan? @relation(fields: [soTK], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_LICHSUNAPTIEN_TAIKHOANTHANHTOAN")
 
   @@map("LICHSUNAPTIEN")
+}
+
+enum TrangThaiNhacNo {
+  pending
+  done
+  cancel
 }
 
 enum LoaiCK {
