@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { isAxiosError } from 'axios';
 
 import { AxiosService } from '../../axios/axios.service';
+import { HCMUSBANK_TTL } from '../../constants';
 
 import { FindOneAccountResponseDto } from './dto/find-one-account-response.dto';
 import { FindOneAccountDto } from './dto/find-one-account.dto';
@@ -84,7 +85,10 @@ export class HcmusbankService {
   }
 
   public async findOneAccount({ id }: FindOneAccountDto) {
-    const payload = { accountNumber: id };
+    const payload = {
+      accountNumber: id,
+      expiredAt: new Date(Date.now() + HCMUSBANK_TTL),
+    };
     const data = this.transformPayload(payload);
     const signature = await this.sign(data);
     try {
@@ -102,7 +106,10 @@ export class HcmusbankService {
   }
 
   public async transfer(transferDto: TransferDto) {
-    const payload = Object.assign({}, transferDto);
+    const payload = Object.assign(
+      { expiredAt: new Date(Date.now() + HCMUSBANK_TTL) },
+      transferDto,
+    );
     // As defined by HCMUSBank's API
     // https://github.com/hcmus-internet-banking/backend/blob/a2a1ebf3c9490e403cde93965927c0d8903d5c27/src/pages/api/external/deposit.ts#L19
     if (payload.payer !== 'receiver') {
@@ -118,7 +125,6 @@ export class HcmusbankService {
       .catch((e) => {
         throw this.didReceiveError(e);
       });
-    // TODO verify signature
     return res.data;
   }
 }
