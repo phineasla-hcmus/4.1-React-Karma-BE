@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Transporter } from 'nodemailer';
-import type { SentMessageInfo } from 'nodemailer/lib/smtp-transport';
+import type { SentMessageInfo, Transporter } from 'nodemailer';
 
 @Injectable()
 export class EmailService {
