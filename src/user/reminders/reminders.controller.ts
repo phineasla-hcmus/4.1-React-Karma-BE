@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  ParseBoolPipe,
 } from '@nestjs/common';
 
 import { Pagination, PaginationDto } from '../../pagination';
@@ -31,6 +30,7 @@ export class RemindersController {
     @Pagination() pagination: PaginationDto,
     @Query() dto: FindRemindersDto,
   ) {
+    console.log(pagination);
     return this.remindersService.findAllWithPagination(pagination, dto);
   }
 
