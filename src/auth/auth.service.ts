@@ -1,9 +1,11 @@
 import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
-import { LoginDTO } from './dto/login.dto';
-import { VaiTro } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { VaiTro } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+
+import { PrismaService } from '../prisma/prisma.service';
+
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +24,7 @@ export class AuthService {
     if (!account)
       throw new ForbiddenException({
         errorId: HttpStatus.UNAUTHORIZED,
-        message: 'Access Denied',
+        message: 'Username or password is invalid',
       });
 
     const hoTen = await this.getName(account.maTK, account.vaiTro);
@@ -34,7 +36,7 @@ export class AuthService {
     if (!passwordMatch)
       throw new ForbiddenException({
         errorId: HttpStatus.UNAUTHORIZED,
-        message: 'Access Denied',
+        message: 'Username or password is invalid',
       });
 
     const tokens = await this.getTokens(
@@ -69,16 +71,16 @@ export class AuthService {
         hoatDong: true,
       },
     });
-    if (!account)
+    if (!account || !account.refreshToken)
       throw new ForbiddenException({
-        errorId: HttpStatus.UNAUTHORIZED,
+        errorId: HttpStatus.FORBIDDEN,
         message: 'Access Denied',
       });
     const hoTen = await this.getName(maTK, account.vaiTro);
     const rtMatch = await bcrypt.compare(rt, account.refreshToken);
     if (!rtMatch)
       throw new ForbiddenException({
-        errorId: HttpStatus.UNAUTHORIZED,
+        errorId: HttpStatus.FORBIDDEN,
         message: 'Access Denied',
       });
 
@@ -101,7 +103,7 @@ export class AuthService {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: maTK,
+          maTK: maTK,
           tenDangNhap,
           hoTen,
           vaiTro,
@@ -113,7 +115,7 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: maTK,
+          maTK: maTK,
           tenDangNhap,
           hoTen,
           vaiTro,

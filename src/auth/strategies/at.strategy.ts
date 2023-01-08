@@ -4,7 +4,7 @@ import { VaiTro } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 type JwtPayLoad = {
-  sub: string;
+  maTK: string;
   tenDangNhap: string;
   hoTen: string;
   vaiTro: VaiTro;

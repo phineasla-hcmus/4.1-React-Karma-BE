@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 
+import { AuthModule } from './auth/auth.module';
 import { BankersModule } from './bankers/bankers.module';
 import { ClientsModule } from './clients/clients.module';
+import { AtGuard } from './common/guards';
 import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import { AuthModule } from './auth/auth.module';
     ExternalModule,
     UserModule,
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
   ],
 })
 export class AppModule {}
