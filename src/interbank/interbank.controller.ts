@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   HttpStatus,
@@ -22,6 +23,7 @@ import {
 } from '../swagger/swagger.decorator';
 
 import {
+  BankResponseDto,
   InterbankResponseDto,
   InterbankTransferResponseDto,
 } from './dto/interbank.response.dto';
