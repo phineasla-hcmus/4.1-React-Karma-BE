@@ -51,3 +51,20 @@ export class InterbankTransferResponseDto {
   @ApiProperty()
   phiCK: number;
 }
+
+export class BankResponseDto {
+  @ApiProperty()
+  maNH: number;
+
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  tenNH: string;
+
+  @ApiProperty()
+  kPublic: string;
+
+  @ApiProperty()
+  coCheBaoMat: number;
+}
