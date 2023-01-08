@@ -1,6 +1,12 @@
-import { IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
+
+export enum ReminderType {
+  ForMe = 'me',
+  ForOthers = 'others',
+}
 
 export class FindRemindersDto {
   @IsOptional()
-  me: boolean;
+  @IsEnum(ReminderType)
+  type: ReminderType = ReminderType.ForMe;
 }
