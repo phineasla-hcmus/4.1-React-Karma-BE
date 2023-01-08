@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 
+import { AuthModule } from './auth/auth.module';
 import { BankersModule } from './bankers/bankers.module';
+import { BanksModule } from './banks/banks.module';
 import { ClientsModule } from './clients/clients.module';
+import { AtGuard } from './common/guards';
 import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
-import { BanksModule } from './banks/banks.module';
 
 @Module({
   imports: [
@@ -17,6 +20,7 @@ import { BanksModule } from './banks/banks.module';
       isGlobal: true,
     }),
     PrismaModule,
+    BanksModule,
     BankersModule,
     InterbankModule,
     ClientsModule,
@@ -24,7 +28,13 @@ import { BanksModule } from './banks/banks.module';
     PaymentAccountsModule,
     ExternalModule,
     UserModule,
-    BanksModule,
+    AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
   ],
 })
 export class AppModule {}
