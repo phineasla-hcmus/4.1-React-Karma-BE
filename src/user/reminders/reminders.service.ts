@@ -3,12 +3,13 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TrangThaiNhacNo } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 import { formatResponse, PaginationDto } from '../../pagination';
 import { PrismaService } from '../../prisma/prisma.service';
 
+import { CancelReminderDto } from './dto/cancel-reminder.dto';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { FindRemindersDto, ReminderType } from './dto/find-reminders.dto';
 
@@ -88,8 +89,15 @@ export class RemindersService {
     );
   }
 
-  remove(id: number) {
+  async findOne(maNN: number) {
+    return this.prismaService.nhacNo.findUnique({ where: { maNN: maNN } });
+  }
+
+  async cancel(maNN: number, dto: CancelReminderDto) {
     // TODO realtime notification
-    return `This action removes a #${id} reminder`;
+    return this.prismaService.nhacNo.update({
+      where: { maNN: maNN },
+      data: { noiDungXoa: dto.noiDungXoa, trangThai: TrangThaiNhacNo.cancel },
+    });
   }
 }

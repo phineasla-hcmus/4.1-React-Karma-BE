@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
 
 export enum ReminderType {
@@ -6,6 +7,7 @@ export enum ReminderType {
 }
 
 export class FindRemindersDto {
+  @ApiProperty({ enum: ReminderType })
   @IsOptional()
   @IsEnum(ReminderType)
   type: ReminderType = ReminderType.ForMe;
