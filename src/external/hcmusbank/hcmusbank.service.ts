@@ -106,10 +106,10 @@ export class HcmusbankService {
   }
 
   public async transfer(transferDto: TransferDto) {
-    const payload = Object.assign(
-      { expiredAt: new Date(Date.now() + HCMUSBANK_TTL) },
-      transferDto,
-    );
+    const payload = {
+      ...transferDto,
+      expiredAt: new Date(Date.now() + HCMUSBANK_TTL),
+    };
     // As defined by HCMUSBank's API
     // https://github.com/hcmus-internet-banking/backend/blob/a2a1ebf3c9490e403cde93965927c0d8903d5c27/src/pages/api/external/deposit.ts#L19
     if (payload.payer !== 'receiver') {
