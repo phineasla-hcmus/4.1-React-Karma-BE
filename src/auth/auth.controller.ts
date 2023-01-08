@@ -7,11 +7,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
-import { GetCurrentAccount, Public } from '../common/decorators';
+import { JwtUser, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
 
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
+import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,10 +25,24 @@ export class AuthController {
     return await this.authService.login(loginDto);
   }
 
+  @Public()
+  @Post('/admin/login')
+  @HttpCode(HttpStatus.OK)
+  async adminLogin(@Body() loginDto: LoginDTO) {
+    return await this.authService.login(loginDto);
+  }
+
+  @Public()
+  @Post('/bankers/login')
+  @HttpCode(HttpStatus.OK)
+  async BankerLogin(@Body() loginDto: LoginDTO) {
+    return await this.authService.login(loginDto);
+  }
+
   @UseGuards(AtGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentAccount('maTK') maTK: number) {
+  logout(@JwtUser('maTK') maTK: number) {
     return this.authService.logout(maTK);
   }
 
@@ -35,7 +50,7 @@ export class AuthController {
   @UseGuards(RtGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refreshTokens(@GetCurrentAccount() account) {
+  refreshTokens(@JwtUser() account: JwtPayloadDto) {
     return this.authService.refreshTokens(
       account['maTK'],
       account['refreshToken'],

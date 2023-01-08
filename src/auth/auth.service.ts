@@ -6,12 +6,15 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { LoginDTO } from './dto/login.dto';
+import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '../constants';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
   async login(loginDto: LoginDTO) {
     const account = await this.prismaService.taiKhoan.findFirst({
@@ -109,8 +112,8 @@ export class AuthService {
           vaiTro,
         },
         {
-          secret: 'at-secret',
-          expiresIn: 60 * 15,
+          secret: this.configService.getOrThrow('AT_SECRET'),
+          expiresIn: ACCESS_TOKEN_TTL,
         },
       ),
       this.jwtService.signAsync(
@@ -121,8 +124,8 @@ export class AuthService {
           vaiTro,
         },
         {
-          secret: 'rt-secret',
-          expiresIn: 60 * 60 * 24 * 7,
+          secret: this.configService.getOrThrow('RT_SECRET'),
+          expiresIn: REFRESH_TOKEN_TTL,
         },
       ),
     ]);

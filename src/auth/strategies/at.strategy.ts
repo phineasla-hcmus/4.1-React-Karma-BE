@@ -1,23 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { VaiTro } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { JwtPayloadDto } from '../../jwt/jwt.dto';
+import { ConfigService } from '@nestjs/config';
 
-type JwtPayLoad = {
-  maTK: string;
-  tenDangNhap: string;
-  hoTen: string;
-  vaiTro: VaiTro;
-};
 @Injectable()
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'at-secret',
+      secretOrKey: configService.getOrThrow('AT_SECRET'),
     });
   }
-  validate(payload: JwtPayLoad) {
+  validate(payload: JwtPayloadDto) {
     return payload;
   }
 }
