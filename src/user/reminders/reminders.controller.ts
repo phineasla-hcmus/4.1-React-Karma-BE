@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { RemindersService } from './reminders.service';
-import { CreateReminderDto } from './dto/create-reminder.dto';
-import { UpdateReminderDto } from './dto/update-reminder.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseBoolPipe,
+} from '@nestjs/common';
 
-@Controller('reminders')
+import { Pagination, PaginationDto } from '../../pagination';
+
+import { CreateReminderDto } from './dto/create-reminder.dto';
+import { FindRemindersDto } from './dto/find-reminders.dto';
+import { UpdateReminderDto } from './dto/update-reminder.dto';
+import { RemindersService } from './reminders.service';
+
+@Controller('user/reminders')
 export class RemindersController {
   constructor(private readonly remindersService: RemindersService) {}
 
@@ -13,8 +27,11 @@ export class RemindersController {
   }
 
   @Get()
-  findAll() {
-    return this.remindersService.findAll();
+  findAll(
+    @Pagination() pagination: PaginationDto,
+    @Query() dto: FindRemindersDto,
+  ) {
+    return this.remindersService.findAllWithPagination(pagination, dto);
   }
 
   @Get(':id')
@@ -23,7 +40,10 @@ export class RemindersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReminderDto: UpdateReminderDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateReminderDto: UpdateReminderDto,
+  ) {
     return this.remindersService.update(+id, updateReminderDto);
   }
 

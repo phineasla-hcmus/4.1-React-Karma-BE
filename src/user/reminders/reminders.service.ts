@@ -1,15 +1,27 @@
 import { Injectable } from '@nestjs/common';
+
+import { PaginationDto } from '../../pagination';
+import { PrismaService } from '../../prisma/prisma.service';
+
 import { CreateReminderDto } from './dto/create-reminder.dto';
+import { FindRemindersDto } from './dto/find-reminders.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 
 @Injectable()
 export class RemindersService {
+  constructor(private prismaService: PrismaService) {}
+
   create(createReminderDto: CreateReminderDto) {
     return 'This action adds a new reminder';
   }
 
-  findAll() {
-    return `This action returns all reminders`;
+  async findAllWithPagination(
+    pagination: PaginationDto,
+    dto: FindRemindersDto,
+  ) {
+    // const total = await this.prismaService.nhacNo.count({
+    //   where: {},
+    // });
   }
 
   findOne(id: number) {
