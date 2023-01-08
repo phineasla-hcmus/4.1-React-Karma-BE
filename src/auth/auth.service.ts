@@ -1,13 +1,13 @@
 import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { VaiTro } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '../constants';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { LoginDTO } from './dto/login.dto';
-import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '../constants';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {

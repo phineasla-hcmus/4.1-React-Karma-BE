@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { BankersModule } from './bankers/bankers.module';
+import { BanksModule } from './banks/banks.module';
 import { ClientsModule } from './clients/clients.module';
 import { AtGuard } from './common/guards';
 import { ExternalModule } from './external/external.module';
@@ -12,7 +13,6 @@ import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module'
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
-import { BanksModule } from './banks/banks.module';
 
 @Module({
   imports: [

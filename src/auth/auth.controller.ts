@@ -9,10 +9,10 @@ import {
 
 import { JwtUser, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
+import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
-import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -51,9 +51,6 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   refreshTokens(@JwtUser() account: JwtPayloadDto) {
-    return this.authService.refreshTokens(
-      account['maTK'],
-      account['refreshToken'],
-    );
+    return this.authService.refreshTokens(account.maTK, account.refreshToken);
   }
 }

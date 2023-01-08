@@ -6,6 +6,7 @@ export class JwtUserDto {
   tenDangNhap: string;
   hoTen: string;
   vaiTro: VaiTro;
+  refreshToken: string;
 }
 
 export class JwtPayloadDto extends JwtUserDto implements JwtPayload {}
