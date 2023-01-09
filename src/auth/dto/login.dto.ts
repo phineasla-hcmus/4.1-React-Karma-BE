@@ -8,4 +8,8 @@ export class LoginDTO {
   @IsString()
   @IsNotEmpty()
   matKhau: string;
+
+  @IsString()
+  @IsNotEmpty()
+  recaptchaValue: string;
 }

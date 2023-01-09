@@ -9,6 +9,7 @@ import {
 
 import { JwtUser, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
+import { RecaptchaGuard } from '../common/guards/recaptcha.guard';
 import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 import { AuthService } from './auth.service';
@@ -19,24 +20,30 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    const data = await this.authService.login(loginDto);
+    return { data };
   }
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('/admin/login')
   @HttpCode(HttpStatus.OK)
   async adminLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    const data = await this.authService.adminLogin(loginDto);
+    return { data };
   }
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('/bankers/login')
   @HttpCode(HttpStatus.OK)
   async BankerLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    const data = await this.authService.bankerLogin(loginDto);
+    return { data };
   }
 
   @UseGuards(AtGuard)
