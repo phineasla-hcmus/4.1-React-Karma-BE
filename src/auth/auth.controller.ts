@@ -29,14 +29,14 @@ export class AuthController {
   @Post('/admin/login')
   @HttpCode(HttpStatus.OK)
   async adminLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    return await this.authService.adminLogin(loginDto);
   }
 
   @Public()
   @Post('/bankers/login')
   @HttpCode(HttpStatus.OK)
   async BankerLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    return await this.authService.bankerLogin(loginDto);
   }
 
   @UseGuards(AtGuard)

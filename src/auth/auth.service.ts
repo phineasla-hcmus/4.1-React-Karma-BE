@@ -17,12 +17,80 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async login(loginDto: LoginDTO) {
-    const account = await this.prismaService.taiKhoan.findFirst({
-      where: {
-        tenDangNhap: loginDto.tenDangNhap,
-        hoatDong: true,
-      },
-    });
+    const account = await this.findAccountWithRole(
+      loginDto.tenDangNhap,
+      VaiTro.User,
+    );
+
+    if (!account)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Username or password is invalid',
+      });
+
+    const hoTen = await this.getName(account.maTK, account.vaiTro);
+    const passwordMatch = await bcrypt.compare(
+      loginDto.matKhau,
+      account.matKhau,
+    );
+
+    if (!passwordMatch)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Username or password is invalid',
+      });
+
+    const tokens = await this.getTokens(
+      account.maTK,
+      account.tenDangNhap,
+      account.vaiTro,
+      hoTen,
+    );
+
+    await this.saveRtHash(account.maTK, tokens.refreshToken);
+    return tokens;
+  }
+
+  async adminLogin(loginDto: LoginDTO) {
+    const account = await this.findAccountWithRole(
+      loginDto.tenDangNhap,
+      VaiTro.Admin,
+    );
+
+    if (!account)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Username or password is invalid',
+      });
+
+    const hoTen = await this.getName(account.maTK, account.vaiTro);
+    const passwordMatch = await bcrypt.compare(
+      loginDto.matKhau,
+      account.matKhau,
+    );
+
+    if (!passwordMatch)
+      throw new ForbiddenException({
+        errorId: HttpStatus.UNAUTHORIZED,
+        message: 'Username or password is invalid',
+      });
+
+    const tokens = await this.getTokens(
+      account.maTK,
+      account.tenDangNhap,
+      account.vaiTro,
+      hoTen,
+    );
+
+    await this.saveRtHash(account.maTK, tokens.refreshToken);
+    return tokens;
+  }
+
+  async bankerLogin(loginDto: LoginDTO) {
+    const account = await this.findAccountWithRole(
+      loginDto.tenDangNhap,
+      VaiTro.Banker,
+    );
 
     if (!account)
       throw new ForbiddenException({
@@ -170,5 +238,16 @@ export class AuthService {
       });
       return user.hoTen;
     }
+  }
+
+  async findAccountWithRole(username: string, role: VaiTro) {
+    const account = await this.prismaService.taiKhoan.findFirst({
+      where: {
+        tenDangNhap: username,
+        hoatDong: true,
+        vaiTro: role,
+      },
+    });
+    return account;
   }
 }
