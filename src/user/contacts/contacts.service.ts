@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PaymentAccountsService } from '../../paymentAccounts/paymentAccounts.service';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -13,7 +15,10 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 
 @Injectable()
 export class ContactsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private paymentAccountsService: PaymentAccountsService,
+  ) {}
 
   async findOne({ maTK, nguoiDung }: FindOneContactDto) {
     return this.prismaService.danhSachDaLuu.findUnique({
@@ -26,10 +31,19 @@ export class ContactsService {
   }
 
   async create(maTK: number, { nguoiDung, tenGoiNho }: CreateContactDto) {
+    const paymentAccount = await this.paymentAccountsService.findOneInfo(
+      nguoiDung,
+    );
+    if (!paymentAccount) {
+      throw new NotFoundException({
+        errorId: 'not_found_payment_account',
+        message: `Cannot find payment account with ID ${nguoiDung}`,
+      });
+    }
     return this.prismaService.danhSachDaLuu
       .create({
         data: {
-          tenGoiNho: tenGoiNho,
+          tenGoiNho: tenGoiNho || paymentAccount.hoTen,
           taiKhoanChuDS: { connect: { maTK: maTK } },
           taiKhoanNguoiDung: { connect: { soTK: nguoiDung } },
         },
