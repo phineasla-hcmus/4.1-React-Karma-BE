@@ -9,6 +9,7 @@ import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.servi
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
+import { FeeType } from '../types';
 
 import { TransferDto } from './dto/transfer.dto';
 
@@ -64,17 +65,19 @@ export class UserService {
         },
         tx,
       );
+      const senderFee = transferDto.loaiCK === FeeType.Sender ? FEE : 0;
       await this.paymentAccountService.decreaseBalance(
         {
           soTK: transferDto.soTK,
-          amount: transferDto.soTien,
+          amount: transferDto.soTien + senderFee,
         },
         tx,
       );
+      const receiverFee = transferDto.loaiCK === FeeType.Receiver ? FEE : 0;
       await this.paymentAccountService.increaseBalance(
         {
           soTK: transferDto.nguoiNhan,
-          amount: transferDto.soTien,
+          amount: transferDto.soTien - receiverFee,
         },
         tx,
       );

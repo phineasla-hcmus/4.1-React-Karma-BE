@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { PaymentAccountsService } from '../../paymentAccounts/paymentAccounts.service';
 
+import { PaymentAccountsService } from '../../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateContactDto } from './dto/create-contact.dto';
