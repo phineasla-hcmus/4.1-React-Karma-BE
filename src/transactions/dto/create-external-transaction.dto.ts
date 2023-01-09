@@ -3,5 +3,6 @@ export interface CreateExternalTransactionDto {
   external: string;
   bank: string;
   amount: number;
+  fee: number;
   message: string;
 }

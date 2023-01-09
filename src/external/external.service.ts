@@ -4,10 +4,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+import { FEE } from '../constants';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
+import { FeeType } from '../types';
 
 import { FindOneBankDto } from './dto/find-one-bank.dto';
 import { FindOneExternalDto } from './dto/find-one-external.dto';
@@ -25,7 +27,7 @@ export class ExternalService {
   ) {}
 
   async findOneBank({ id, name }: FindOneBankDto) {
-    if (id == null || name == null) {
+    if (id == null && name == null) {
       return null;
     }
     return this.prismaService.nganHangLienKet.findUnique({
@@ -103,14 +105,19 @@ export class ExternalService {
           bank: transferDto.nganHang,
           // Minus indicate a deposit transaction
           amount: -transferDto.soTien,
+          fee: transferDto.loaiCK === FeeType.Sender ? FEE : 0,
           message: transferDto.noiDung,
         },
         tx,
       );
+      let amount = transferDto.soTien;
+      if (transferDto.loaiCK === FeeType.Sender) {
+        amount += FEE;
+      }
       await this.paymentAccountService.decreaseBalance(
         {
           soTK: transferDto.soTK,
-          amount: transferDto.soTien,
+          amount,
         },
         tx,
       );

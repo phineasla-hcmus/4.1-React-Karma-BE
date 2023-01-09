@@ -33,7 +33,7 @@ export class ExternalController {
     }
     throw new NotFoundException({
       errorId: 'bank_not_found',
-      message: `Cannot find bank with name ${findOneAccountDto.nganHang}`,
+      message: `Cannot find account with name ${findOneAccountDto.id} from ${findOneAccountDto.nganHang}`,
     });
   }
 
