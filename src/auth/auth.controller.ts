@@ -13,12 +13,14 @@ import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
+import { RecaptchaGuard } from '../common/guards/recaptcha.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDTO) {
@@ -26,6 +28,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('/admin/login')
   @HttpCode(HttpStatus.OK)
   async adminLogin(@Body() loginDto: LoginDTO) {
@@ -33,6 +36,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(RecaptchaGuard)
   @Post('/bankers/login')
   @HttpCode(HttpStatus.OK)
   async BankerLogin(@Body() loginDto: LoginDTO) {
