@@ -24,7 +24,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDTO) {
-    return await this.authService.login(loginDto);
+    const data = await this.authService.login(loginDto);
+    return { data };
   }
 
   @Public()
@@ -32,7 +33,8 @@ export class AuthController {
   @Post('/admin/login')
   @HttpCode(HttpStatus.OK)
   async adminLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.adminLogin(loginDto);
+    const data = await this.authService.adminLogin(loginDto);
+    return { data };
   }
 
   @Public()
@@ -40,7 +42,8 @@ export class AuthController {
   @Post('/bankers/login')
   @HttpCode(HttpStatus.OK)
   async BankerLogin(@Body() loginDto: LoginDTO) {
-    return await this.authService.bankerLogin(loginDto);
+    const data = await this.authService.bankerLogin(loginDto);
+    return { data };
   }
 
   @UseGuards(AtGuard)
