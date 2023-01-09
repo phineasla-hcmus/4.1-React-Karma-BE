@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -13,6 +15,10 @@ import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.servi
 import { PrismaService } from '../prisma/prisma.service';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
+import { transferDTO } from './dto/transfer.dto';
+import * as jwt from 'jsonwebtoken';
+import * as fs from 'fs';
+import { nganHangLienKet } from '@prisma/client';
 
 @Injectable()
 export class InterbankService {
@@ -191,31 +197,51 @@ export class InterbankService {
     }
   }
 
-  async findStatistic() {
+  async externalBankTransfer(transferDto: transferDTO) {
+    const banks = await this.prismaService.nganHangLienKet.findMany();
+    for (let i = 0; i < banks.length; i++) {
+      const decode = jwt.verify(transferDto.token, banks.at(i).kPublic);
+      console.log(decode);
+    }
+
+    const user = await this.paymentAccountService.getInfoByAccountNo(
+      transferDto.nguoiNhan,
+    );
+
+    if (!user) {
+      throw new BadRequestException({
+        errorId: HttpStatus.NOT_FOUND,
+        message: 'Account not found',
+      });
+    }
+
     try {
-      const [sent, received] = await Promise.all([
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
-          },
-          where: {
-            soTien: { lt: 0 },
+      await this.prismaService.$transaction([
+        this.prismaService.chuyenKhoanNganHangNgoai.create({
+          data: {
+            tkNgoai: transferDto.nguoiChuyen,
+            tkTrong: transferDto.nguoiNhan,
+            noiDungCK: transferDto.noiDungCK,
+            soTien: transferDto.soTien,
+            maNganHang: 1,
           },
         }),
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
+        this.prismaService.taiKhoanThanhToan.update({
+          data: {
+            soDu: user.soDu + transferDto.soTien,
           },
           where: {
-            soTien: {
-              gt: 0,
-            },
+            soTK: transferDto.nguoiNhan,
           },
         }),
       ]);
-      return { soTienGui: -sent._sum.soTien, soTienNhan: received._sum.soTien };
     } catch (e) {
-      this.handleError(e);
+      if (e instanceof Error) {
+        throw new InternalServerErrorException({
+          errorId: e.name,
+          message: e.message,
+        });
+      }
     }
   }
 }

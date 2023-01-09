@@ -3,4 +3,6 @@ export class transferDTO {
   nguoiChuyen: string;
   soTien: number;
   noiDungCK: string;
+  iat: Date;
+  token: string;
 }

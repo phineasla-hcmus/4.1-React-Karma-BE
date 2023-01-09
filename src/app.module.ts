@@ -13,6 +13,7 @@ import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module'
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
+import { CryptographyModule } from './cryptography/cryptography.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
     ExternalModule,
     UserModule,
     AuthModule,
+    CryptographyModule,
   ],
   providers: [
     {
