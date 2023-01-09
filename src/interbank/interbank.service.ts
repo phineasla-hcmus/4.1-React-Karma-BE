@@ -244,4 +244,8 @@ export class InterbankService {
       }
     }
   }
+
+  async getBanksList() {
+    return await this.prismaService.nganHangLienKet.findMany();
+  }
 }

@@ -14,4 +14,14 @@ export class CryptographyService {
     const signature = sign.sign(privatKey, 'base64');
     return signature;
   }
+
+  async verify(data: string, signature: string) {
+    const key = await fs.readFile('secret/request.public.pem', 'utf-8');
+    const verify = crypto.createVerify('RSA-SHA256');
+    verify.update(data);
+    verify.end();
+
+    const verified = verify.verify(key, signature, 'base64');
+    return verified;
+  }
 }

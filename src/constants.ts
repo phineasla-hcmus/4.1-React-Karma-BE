@@ -13,3 +13,5 @@ export const REFRESH_TOKEN_TTL = 60 * 60 * 24 * 7; // 1 week
 export const ACCESS_TOKEN_TTL = 60 * 15; // 15 minutes
 
 export const HCMUSBANK_TTL = 5 * 60 * 1000;
+
+export const API_TIMEOUT = 60 * 15; // 15 minutes

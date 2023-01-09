@@ -1,13 +1,9 @@
-import {
-  IsDate,
-  IsDateString,
-  IsISO8601,
-  IsNotEmpty,
-  IsString,
-  isISO8601,
-} from 'class-validator';
+import { IsISO8601, IsNotEmpty, IsString } from 'class-validator';
 
 export class InterbankRequestDTO {
+  @IsString()
+  chuKy: string;
+
   @IsString()
   @IsNotEmpty()
   soTK: string;
@@ -15,7 +11,4 @@ export class InterbankRequestDTO {
   @IsISO8601()
   @IsNotEmpty()
   ngayTao: string;
-
-  // @IsString()
-  // chuKy: string;
 }

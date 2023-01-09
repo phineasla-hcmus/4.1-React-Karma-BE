@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -36,6 +37,9 @@ import { transferDTO } from './dto/transfer.dto';
 import { CryptographyService } from '../cryptography/cryptography.service';
 import { InterbankRequestDTO } from './dto/interbank.request.dto';
 import { Public } from '../common/decorators';
+import { nganHangLienKet } from '@prisma/client';
+import { verify } from 'crypto';
+import { API_TIMEOUT } from '../constants';
 
 @Controller('interbank')
 export class InterbankController {
@@ -54,7 +58,34 @@ export class InterbankController {
     type: InterbankResponseDto,
     description: 'Successfully fetched an interbank account info',
   })
+  @ApiBody({ type: InterbankRequestDTO })
   async getAccount(@Body() body: InterbankRequestDTO) {
+    const banksList = await this.interbankService.getBanksList();
+    if (!banksList || banksList.length === 0) {
+      throw new NotFoundException({
+        errorId: HttpStatus.NOT_FOUND,
+        message: 'No Linked Bank',
+      });
+    }
+    const { chuKy, ...bodyData } = body;
+    const verified = await this.cryptographyService.verify(
+      JSON.stringify(bodyData),
+      chuKy,
+    );
+
+    if (!verified) {
+      throw new BadRequestException({
+        errorId: HttpStatus.BAD_REQUEST,
+        message: 'Invalid Signature',
+      });
+    }
+    const dateDiff = new Date().getTime() - new Date(body.ngayTao).getTime();
+    if (dateDiff > API_TIMEOUT) {
+      throw new BadRequestException({
+        errorId: HttpStatus.BAD_REQUEST,
+        message: 'Timeout',
+      });
+    }
     const res = await this.interbankService.getPaymentAccountInfo(body.soTK);
     if (!res) {
       throw new BadRequestException({
@@ -102,8 +133,6 @@ export class InterbankController {
     @Pagination() pagination: PaginationDto,
     @Query() query: InterbankTransactionQueryDto,
   ) {
-    console.log(query.from);
-
     try {
       return this.interbankService.findAllWithPagination(pagination, query);
     } catch (e) {
