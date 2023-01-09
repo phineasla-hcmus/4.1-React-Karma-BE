@@ -201,6 +201,7 @@ export class TransactionsService {
       data: {
         tkNgoai: dto.external,
         soTien: dto.amount,
+        phiCK: dto.amount,
         noiDungCK: dto.message,
         nganHangLK: {
           connect: { tenNH: dto.bank },
