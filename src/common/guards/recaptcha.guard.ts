@@ -13,7 +13,7 @@ export class RecaptchaGuard implements CanActivate {
   constructor(private configService: ConfigService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { body } = context.switchToHttp().getRequest();
-    const key = this.configService.getOrThrow('SECRET_KEY');
+    const key = this.configService.getOrThrow('RECAPTCHA_KEY');
     const result = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${key}&response=${body.recaptchaValue}`,
       {},

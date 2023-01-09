@@ -92,23 +92,13 @@ export class AuthService {
       VaiTro.Banker,
     );
 
-    if (!account)
+    if (!account || !(await bcrypt.compare(loginDto.matKhau, account.matKhau)))
       throw new ForbiddenException({
         errorId: HttpStatus.UNAUTHORIZED,
         message: 'Username or password is invalid',
       });
 
     const hoTen = await this.getName(account.maTK, account.vaiTro);
-    const passwordMatch = await bcrypt.compare(
-      loginDto.matKhau,
-      account.matKhau,
-    );
-
-    if (!passwordMatch)
-      throw new ForbiddenException({
-        errorId: HttpStatus.UNAUTHORIZED,
-        message: 'Username or password is invalid',
-      });
 
     const tokens = await this.getTokens(
       account.maTK,
