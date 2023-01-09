@@ -9,11 +9,11 @@ import {
 
 import { JwtUser, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
+import { RecaptchaGuard } from '../common/guards/recaptcha.guard';
 import { JwtPayloadDto } from '../jwt/jwt.dto';
 
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
-import { RecaptchaGuard } from '../common/guards/recaptcha.guard';
 
 @Controller('auth')
 export class AuthController {
