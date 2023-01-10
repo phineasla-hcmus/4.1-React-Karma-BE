@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+import { BanksService } from '../banks/banks.service';
 import { FEE } from '../constants';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,7 +12,6 @@ import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
 import { FeeType } from '../types';
 
-import { FindOneBankDto } from './dto/find-one-bank.dto';
 import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { HcmusbankService } from './hcmusbank/hcmusbank.service';
@@ -20,6 +20,7 @@ import { HcmusbankService } from './hcmusbank/hcmusbank.service';
 export class ExternalService {
   constructor(
     private prismaService: PrismaService,
+    private banksService: BanksService,
     private paymentAccountService: PaymentAccountsService,
     private otpService: TransactionOtpService,
     private transactionService: TransactionsService,
@@ -28,15 +29,6 @@ export class ExternalService {
 
   async findAll() {
     return this.prismaService.nganHangLienKet.findMany();
-  }
-
-  async findOneBank({ id, name }: FindOneBankDto) {
-    if (id == null && name == null) {
-      return null;
-    }
-    return this.prismaService.nganHangLienKet.findUnique({
-      where: { maNH: id, tenNH: name },
-    });
   }
 
   async findOneExternal(findOneExternalDto: FindOneExternalDto) {
@@ -67,7 +59,7 @@ export class ExternalService {
       });
     }
     await Promise.all([
-      this.findOneBank({ name: transferDto.nganHang }).then((v) => {
+      this.banksService.findOne({ name: transferDto.nganHang }).then((v) => {
         if (v != null) return v;
         throw new NotFoundException({
           errorId: 'bank_not_found',
