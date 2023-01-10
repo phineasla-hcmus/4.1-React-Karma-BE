@@ -67,11 +67,16 @@ export class InterbankController {
         message: 'No Linked Bank',
       });
     }
+    let verified: boolean;
     const { chuKy, ...bodyData } = body;
-    const verified = await this.cryptographyService.verify(
-      JSON.stringify(bodyData),
-      chuKy,
-    );
+    for (let i = 0; i < banksList.length; i++) {
+      verified = await this.cryptographyService.verify(
+        JSON.stringify(bodyData),
+        chuKy,
+        banksList.at(i).kPublic,
+      );
+      if (verified) break;
+    }
 
     if (!verified) {
       throw new BadRequestException({
@@ -82,7 +87,7 @@ export class InterbankController {
     const dateDiff = new Date().getTime() - new Date(body.ngayTao).getTime();
     if (dateDiff > API_TIMEOUT) {
       throw new BadRequestException({
-        errorId: HttpStatus.BAD_REQUEST,
+        errorId: HttpStatus.FORBIDDEN,
         message: 'Timeout',
       });
     }
@@ -162,8 +167,56 @@ export class InterbankController {
     }
   }
 
-  @Post('transfer')
+  @Public()
+  @Post('api/transfer')
   async externalBankTransfer(@Body() body: transferDTO) {
-    return await this.interbankService.externalBankTransfer(body);
+    const banksList = await this.interbankService.getBanksList();
+    if (!banksList || banksList.length === 0) {
+      throw new NotFoundException({
+        errorId: HttpStatus.NOT_FOUND,
+        message: 'No Linked Bank',
+      });
+    }
+    let verified: boolean;
+    let id: number;
+    const { chuKy, ...bodyData } = body;
+    for (let i = 0; i < banksList.length; i++) {
+      try {
+        verified = await this.cryptographyService.verify(
+          JSON.stringify(bodyData),
+          chuKy,
+          banksList.at(i).kPublic,
+        );
+      } catch (e) {}
+      if (verified) {
+        id = banksList.at(i).maNH;
+        break;
+      }
+    }
+
+    if (!verified) {
+      throw new BadRequestException({
+        errorId: HttpStatus.BAD_REQUEST,
+        message: 'Invalid Signature',
+      });
+    }
+    const dateDiff = new Date().getTime() - new Date(body.ngayTao).getTime();
+    if (dateDiff < 0 || dateDiff > API_TIMEOUT) {
+      throw new BadRequestException({
+        errorId: HttpStatus.FORBIDDEN,
+        message: 'Timeout',
+      });
+    }
+
+    const res = await this.interbankService.externalBankTransfer(body, id);
+    const signature = await this.cryptographyService.sign(JSON.stringify(res));
+    if (!signature) {
+      throw new InternalServerErrorException({
+        errorId: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+    res['chuKy'] = signature;
+    return res;
   }
 }

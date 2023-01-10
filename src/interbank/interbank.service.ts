@@ -197,13 +197,7 @@ export class InterbankService {
     }
   }
 
-  async externalBankTransfer(transferDto: transferDTO) {
-    const banks = await this.prismaService.nganHangLienKet.findMany();
-    for (let i = 0; i < banks.length; i++) {
-      const decode = jwt.verify(transferDto.token, banks.at(i).kPublic);
-      console.log(decode);
-    }
-
+  async externalBankTransfer(transferDto: transferDTO, bankId: number) {
     const user = await this.paymentAccountService.getInfoByAccountNo(
       transferDto.nguoiNhan,
     );
@@ -216,14 +210,18 @@ export class InterbankService {
     }
 
     try {
-      await this.prismaService.$transaction([
+      const [transaction, account] = await this.prismaService.$transaction([
         this.prismaService.chuyenKhoanNganHangNgoai.create({
           data: {
             tkNgoai: transferDto.nguoiChuyen,
             tkTrong: transferDto.nguoiNhan,
             noiDungCK: transferDto.noiDungCK,
             soTien: transferDto.soTien,
-            maNganHang: 1,
+            maNganHang: bankId,
+          },
+          select: {
+            maCKN: true,
+            soTien: true,
           },
         }),
         this.prismaService.taiKhoanThanhToan.update({
@@ -235,6 +233,7 @@ export class InterbankService {
           },
         }),
       ]);
+      return transaction;
     } catch (e) {
       if (e instanceof Error) {
         throw new InternalServerErrorException({
