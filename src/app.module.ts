@@ -7,13 +7,13 @@ import { BankersModule } from './bankers/bankers.module';
 import { BanksModule } from './banks/banks.module';
 import { ClientsModule } from './clients/clients.module';
 import { AtGuard } from './common/guards';
+import { CryptographyModule } from './cryptography/cryptography.module';
 import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
-import { CryptographyModule } from './cryptography/cryptography.module';
 
 @Module({
   imports: [

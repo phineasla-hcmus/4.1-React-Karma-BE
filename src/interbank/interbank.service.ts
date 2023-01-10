@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
@@ -16,9 +17,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { transferDTO } from './dto/transfer.dto';
-import * as jwt from 'jsonwebtoken';
-import * as fs from 'fs';
-import { nganHangLienKet } from '@prisma/client';
 
 @Injectable()
 export class InterbankService {
