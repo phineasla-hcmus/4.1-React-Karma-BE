@@ -7,6 +7,7 @@ import { BankersModule } from './bankers/bankers.module';
 import { BanksModule } from './banks/banks.module';
 import { ClientsModule } from './clients/clients.module';
 import { AtGuard } from './common/guards';
+import { CryptographyModule } from './cryptography/cryptography.module';
 import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
     ExternalModule,
     UserModule,
     AuthModule,
+    CryptographyModule,
   ],
   providers: [
     {

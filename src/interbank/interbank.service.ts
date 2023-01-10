@@ -1,8 +1,11 @@
 import {
+  BadRequestException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
@@ -13,6 +16,7 @@ import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.servi
 import { PrismaService } from '../prisma/prisma.service';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
+import { transferDTO } from './dto/transfer.dto';
 
 @Injectable()
 export class InterbankService {
@@ -32,10 +36,6 @@ export class InterbankService {
       this.logger.error(e);
     }
     throw e;
-  }
-
-  async getPaymentAccountInfo(soTK: string) {
-    return await this.paymentAccountService.findOneInfo(soTK);
   }
 
   async findAllWithoutPagination() {
@@ -191,31 +191,54 @@ export class InterbankService {
     }
   }
 
-  async findStatistic() {
+  async externalBankTransfer(transferDto: transferDTO, bankId: number) {
+    const user = await this.paymentAccountService.getInfoByAccountNo(
+      transferDto.nguoiNhan,
+    );
+
+    if (!user) {
+      throw new BadRequestException({
+        errorId: HttpStatus.NOT_FOUND,
+        message: 'Account not found',
+      });
+    }
+
     try {
-      const [sent, received] = await Promise.all([
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
+      const [transaction, account] = await this.prismaService.$transaction([
+        this.prismaService.chuyenKhoanNganHangNgoai.create({
+          data: {
+            tkNgoai: transferDto.nguoiChuyen,
+            tkTrong: transferDto.nguoiNhan,
+            noiDungCK: transferDto.noiDungCK,
+            soTien: transferDto.soTien,
+            maNganHang: bankId,
           },
-          where: {
-            soTien: { lt: 0 },
+          select: {
+            maCKN: true,
+            soTien: true,
           },
         }),
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
+        this.prismaService.taiKhoanThanhToan.update({
+          data: {
+            soDu: user.soDu + transferDto.soTien,
           },
           where: {
-            soTien: {
-              gt: 0,
-            },
+            soTK: transferDto.nguoiNhan,
           },
         }),
       ]);
-      return { soTienGui: -sent._sum.soTien, soTienNhan: received._sum.soTien };
+      return transaction;
     } catch (e) {
-      this.handleError(e);
+      if (e instanceof Error) {
+        throw new InternalServerErrorException({
+          errorId: e.name,
+          message: e.message,
+        });
+      }
     }
+  }
+
+  async getBanksList() {
+    return await this.prismaService.nganHangLienKet.findMany();
   }
 }
