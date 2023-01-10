@@ -16,7 +16,10 @@ export class BaseApiDto {
   @IsNotEmpty()
   tenNH: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'ISO 8601',
+    example: new Date().toISOString(),
+  })
   @IsISO8601()
   @IsNotEmpty()
   ngayTao: string;
@@ -34,21 +37,26 @@ export class GetAccountApiDto extends BaseApiDto {
 }
 
 export class TransferApiDto extends BaseApiDto {
+  @ApiProperty()
   @IsNumberString()
   @IsNotEmpty()
   nguoiNhan: string;
 
+  @ApiProperty()
   @IsNumberString()
   @IsNotEmpty()
   nguoiChuyen: string;
 
+  @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
   soTien: number;
 
+  @ApiProperty()
   @IsString()
   noiDungCK: string;
 
+  @ApiProperty({ enum: FeeType })
   @IsEnum(FeeType)
   loaiCK: FeeType;
 }

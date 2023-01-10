@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BaseApiResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'ISO 8601',
+    example: new Date().toISOString(),
+  })
   ngayTao: string;
 
   @ApiProperty()
@@ -35,7 +38,8 @@ export class TransferApiResponseDto extends BaseApiResponseDto {
   phiCK: number;
 
   @ApiProperty({
-    description: 'ISO 8601',
+    description: 'ISO 8601. Transaction time',
+    example: new Date().toISOString(),
   })
   thoiGian: Date;
 }
