@@ -18,15 +18,14 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { nganHangLienKet } from '@prisma/client';
 
 import { Public } from '../common/decorators';
 import { API_TIMEOUT } from '../constants';
 import { CryptographyService } from '../cryptography/cryptography.service';
 import { Pagination, PaginationDto } from '../pagination';
+import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 import {
   ApiOkWrappedResponse,
   ApiPaginatedResponse,
@@ -34,14 +33,12 @@ import {
 
 import { InterbankRequestDTO } from './dto/interbank.request.dto';
 import {
-  BankResponseDto,
   InterbankResponseDto,
   InterbankTransferResponseDto,
 } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { transferDTO } from './dto/transfer.dto';
 import { InterbankService } from './interbank.service';
-import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 
 @Controller('interbank')
 export class InterbankController {
@@ -61,7 +58,6 @@ export class InterbankController {
     type: InterbankResponseDto,
     description: 'Successfully fetched an interbank account info',
   })
-  @ApiBody({ type: InterbankRequestDTO })
   async getAccount(@Body() body: InterbankRequestDTO) {
     const banksList = await this.interbankService.getBanksList();
     if (!banksList || banksList.length === 0) {
