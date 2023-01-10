@@ -38,10 +38,6 @@ export class InterbankService {
     throw e;
   }
 
-  async getPaymentAccountInfo(soTK: string) {
-    return await this.paymentAccountService.findOneInfo(soTK);
-  }
-
   async findAllWithoutPagination() {
     try {
       const data = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({

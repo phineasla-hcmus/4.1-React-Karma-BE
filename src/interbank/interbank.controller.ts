@@ -41,11 +41,13 @@ import {
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { transferDTO } from './dto/transfer.dto';
 import { InterbankService } from './interbank.service';
+import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 
 @Controller('interbank')
 export class InterbankController {
   constructor(
     private interbankService: InterbankService,
+    private paymenAccountsService: PaymentAccountsService,
     private cryptographyService: CryptographyService,
   ) {}
 
@@ -92,7 +94,7 @@ export class InterbankController {
         message: 'Timeout',
       });
     }
-    const res = await this.interbankService.getPaymentAccountInfo(body.soTK);
+    const res = await this.paymenAccountsService.findOneInfo(body.soTK);
     if (!res) {
       throw new BadRequestException({
         errorId: HttpStatus.NOT_FOUND,
