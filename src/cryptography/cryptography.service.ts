@@ -1,20 +1,18 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CryptographyService {
-  constructor(
-    @Inject('KARMA_PRIVATE_KEY_TOKEN')
-    private readonly privateKey: string,
-  ) {}
   async sign(data: string) {
+    const privatKey = await fs.readFile('secret/response.private.key', 'utf-8');
+
     const sign = crypto.createSign('RSA-SHA256');
     sign.update(data);
     sign.end();
 
-    const signature = sign.sign(this.privateKey, 'base64');
+    const signature = sign.sign(privatKey, 'base64');
     return signature;
   }
 
