@@ -14,7 +14,7 @@ import {
   ApiPaginatedResponse,
 } from '../swagger/swagger.decorator';
 
-import { InterbankTransferResponseDto } from './dto/interbank.response.dto';
+import { InterbankTransactionResponseDto } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
 
@@ -34,7 +34,7 @@ export class InterbankController {
   @ApiOkWrappedResponse({
     description:
       'Successfully received a non-paginated list of interbank transfer',
-    type: InterbankTransferResponseDto,
+    type: InterbankTransactionResponseDto,
   })
   async findAllWithoutPagination() {
     try {
@@ -50,7 +50,7 @@ export class InterbankController {
   @ApiOperation({
     summary: 'Fetch a paginated list of interbank transfer',
   })
-  @ApiPaginatedResponse({ type: InterbankTransferResponseDto })
+  @ApiPaginatedResponse({ type: InterbankTransactionResponseDto })
   async findAllWithPagination(
     @Pagination() pagination: PaginationDto,
     @Query() query: InterbankTransactionQueryDto,
@@ -74,7 +74,7 @@ export class InterbankController {
   })
   @ApiOkResponse({
     description: 'Successfully fetched a record of interbank transfer',
-    type: InterbankTransferResponseDto,
+    type: InterbankTransactionResponseDto,
   })
   findOne(@Param('maCKN', ParseIntPipe) id: number) {
     try {
