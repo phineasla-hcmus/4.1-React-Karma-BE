@@ -15,7 +15,6 @@ import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.servi
 import { PrismaService } from '../prisma/prisma.service';
 
 import { InterbankTransactionQueryDto } from './dto/query.dto';
-import { transferDTO } from './dto/transfer.dto';
 
 @Injectable()
 export class InterbankService {
@@ -188,56 +187,5 @@ export class InterbankService {
         });
       }
     }
-  }
-
-  async externalBankTransfer(transferDto: transferDTO, bankId: number) {
-    const user = await this.paymentAccountService.getInfoByAccountNo(
-      transferDto.nguoiNhan,
-    );
-
-    if (!user) {
-      throw new BadRequestException({
-        errorId: HttpStatus.NOT_FOUND,
-        message: 'Account not found',
-      });
-    }
-
-    try {
-      const [transaction, account] = await this.prismaService.$transaction([
-        this.prismaService.chuyenKhoanNganHangNgoai.create({
-          data: {
-            tkNgoai: transferDto.nguoiChuyen,
-            tkTrong: transferDto.nguoiNhan,
-            noiDungCK: transferDto.noiDungCK,
-            soTien: transferDto.soTien,
-            maNganHang: bankId,
-          },
-          select: {
-            maCKN: true,
-            soTien: true,
-          },
-        }),
-        this.prismaService.taiKhoanThanhToan.update({
-          data: {
-            soDu: user.soDu + transferDto.soTien,
-          },
-          where: {
-            soTK: transferDto.nguoiNhan,
-          },
-        }),
-      ]);
-      return transaction;
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new InternalServerErrorException({
-          errorId: e.name,
-          message: e.message,
-        });
-      }
-    }
-  }
-
-  async getBanksList() {
-    return await this.prismaService.nganHangLienKet.findMany();
   }
 }
