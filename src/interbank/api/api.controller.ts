@@ -2,10 +2,9 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../common/decorators';
-import { InterbankRequestDto } from '../dto/interbank.request.dto';
 
 import { InterbankApiService } from './api.service';
-import { TransferApiDto } from './dto/api.dto';
+import { GetAccountApiDto, TransferApiDto } from './dto/api.dto';
 import {
   GetAccountApiResponseDto,
   TransferApiResponseDto,
@@ -26,7 +25,7 @@ export class InterbankApiController {
     description: 'Successfully fetched an interbank account info',
   })
   async getAccount(
-    @Body() body: InterbankRequestDto,
+    @Body() body: GetAccountApiDto,
   ): Promise<GetAccountApiResponseDto> {
     return this.apiService.getAccount(body);
   }

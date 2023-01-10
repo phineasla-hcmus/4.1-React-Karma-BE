@@ -12,9 +12,8 @@ import { CryptographyService } from '../../cryptography/cryptography.service';
 import { PaymentAccountsService } from '../../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FeeType } from '../../types';
-import { InterbankRequestDto } from '../dto/interbank.request.dto';
 
-import { BaseApiDto, TransferApiDto } from './dto/api.dto';
+import { BaseApiDto, GetAccountApiDto, TransferApiDto } from './dto/api.dto';
 
 @Injectable()
 export class InterbankApiService {
@@ -62,7 +61,7 @@ export class InterbankApiService {
     return { ...payload, chuKy: signature };
   }
 
-  async getAccount(dto: InterbankRequestDto) {
+  async getAccount(dto: GetAccountApiDto) {
     const bank = await this.banksService.findOne({ name: dto.tenNH });
     await this.verifyRequest(dto, bank);
     const paymentAccount = await this.paymenAccountsService.findOneInfo(
