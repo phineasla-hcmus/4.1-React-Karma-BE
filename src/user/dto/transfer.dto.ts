@@ -3,7 +3,7 @@ import { IsEnum, IsNotEmpty, IsNumber, Min } from 'class-validator';
 
 import { FeeType } from '../../types';
 
-export class TransferDto {
+export class LocalTransferDto {
   @ApiProperty()
   @IsNumber()
   otp: number;

@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { TransactionOtpService } from '../transactions/transactionOtp.service';
 import { TransactionsService } from '../transactions/transactions.service';
 
-import { TransferDto } from './dto/transfer.dto';
+import { LocalTransferDto } from './dto/transfer.dto';
 
 @Injectable()
 export class UserService {
@@ -21,7 +21,7 @@ export class UserService {
     private transactionService: TransactionsService,
   ) {}
 
-  async transfer(transferDto: TransferDto) {
+  async transfer(transferDto: LocalTransferDto) {
     const otp = await this.otpService.findOne(transferDto.soTK);
     if (
       !this.otpService.verify(
