@@ -40,15 +40,15 @@ export class ExternalService {
     return null;
   }
 
-  async transfer(transferDto: TransferDto) {
-    const otp = await this.otpService.findOne(transferDto.soTK);
+  async transfer(dto: TransferDto) {
+    const otp = await this.otpService.findOne(dto.soTK);
     if (
       !this.otpService.verify(
         {
-          otp: transferDto.otp,
-          nguoiNhan: transferDto.nguoiNhan,
-          soTK: transferDto.soTK,
-          soTien: transferDto.soTien,
+          otp: dto.otp,
+          nguoiNhan: dto.nguoiNhan,
+          soTK: dto.soTK,
+          soTien: dto.soTien,
         },
         otp,
       )
@@ -59,36 +59,36 @@ export class ExternalService {
       });
     }
     await Promise.all([
-      this.banksService.findOne({ name: transferDto.nganHang }).then((v) => {
+      this.banksService.findOne({ name: dto.nganHang }).then((v) => {
         if (v != null) return v;
         throw new NotFoundException({
           errorId: 'bank_not_found',
-          message: `Cannot find bank with name ${transferDto.nganHang}`,
+          message: `Cannot find bank with name ${dto.nganHang}`,
         });
       }),
-      this.paymentAccountService.findOne(transferDto.soTK).then((v) => {
+      this.paymentAccountService.findOne(dto.soTK).then((v) => {
         if (v != null) return v;
         throw new NotFoundException({
           errorId: 'payment_account_not_found',
-          message: `Cannot find payment account with ${transferDto.soTK}`,
+          message: `Cannot find payment account with ${dto.soTK}`,
         });
       }),
     ]);
-    switch (transferDto.nganHang) {
+    switch (dto.nganHang) {
       case 'HCMUSBank': {
         await this.hcmusbankService.transfer({
-          fromAccountNumber: transferDto.soTK,
-          toAccountNumber: transferDto.nguoiNhan,
-          amount: transferDto.soTien,
-          message: transferDto.noiDung,
-          payer: transferDto.loaiCK,
+          fromAccountNumber: dto.soTK,
+          toAccountNumber: dto.nguoiNhan,
+          amount: dto.soTien,
+          message: dto.noiDung,
+          payer: dto.loaiCK,
         });
         break;
       }
       default:
         throw new NotFoundException({
           errorId: 'bank_not_found',
-          message: `Cannot find bank with name ${transferDto.nganHang}`,
+          message: `Cannot find bank with name ${dto.nganHang}`,
         });
     }
     return this.prismaService.$transaction(async (tx) => {
@@ -96,23 +96,24 @@ export class ExternalService {
       // Shouldn't throw P2018 because we already checked payment account and bank are valid
       const transaction = await this.transactionService.createExternal(
         {
-          internal: transferDto.soTK,
-          external: transferDto.nguoiNhan,
-          bank: transferDto.nganHang,
+          internal: dto.soTK,
+          external: dto.nguoiNhan,
+          bank: dto.nganHang,
           // Minus indicate a deposit transaction
-          amount: -transferDto.soTien,
-          fee: transferDto.loaiCK === FeeType.Sender ? FEE : 0,
-          message: transferDto.noiDung,
+          amount: -dto.soTien,
+          type: dto.loaiCK,
+          fee: dto.loaiCK === FeeType.Sender ? FEE : 0,
+          message: dto.noiDung,
         },
         tx,
       );
-      let amount = transferDto.soTien;
-      if (transferDto.loaiCK === FeeType.Sender) {
+      let amount = dto.soTien;
+      if (dto.loaiCK === FeeType.Sender) {
         amount += FEE;
       }
       await this.paymentAccountService.decreaseBalance(
         {
-          soTK: transferDto.soTK,
+          soTK: dto.soTK,
           amount,
         },
         tx,
