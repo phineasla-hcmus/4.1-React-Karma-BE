@@ -1,5 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
 import { BanksService } from './banks.service';
 import { BankResponseDto } from './dto/bank.response.dto';
@@ -13,12 +15,20 @@ export class BanksController {
   @ApiOperation({
     summary: 'Fetch a list of banks',
   })
-  @ApiOkResponse({
+  @ApiOkWrappedResponse({
     description: 'Successfully fetched a list of banks',
-    type: [BankResponseDto],
+    isArray: true,
+    type: BankResponseDto,
   })
-  async findAll() {
-    const data = await this.banksService.findAll();
-    return { data };
+  async findAll(): Promise<{ data: BankResponseDto[] }> {
+    const banks = await this.banksService.findAll().catch((e) => {
+      throw new InternalServerErrorException({
+        errorId: 'database_error',
+        message: 'Cannot find banks',
+      });
+    });
+    return {
+      data: banks.map((bank) => ({ id: bank.maNH, tenNH: bank.tenNH })),
+    };
   }
 }
