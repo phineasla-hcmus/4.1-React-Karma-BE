@@ -26,6 +26,10 @@ export class ExternalService {
     private hcmusbankService: HcmusbankService,
   ) {}
 
+  async findAll() {
+    return this.prismaService.nganHangLienKet.findMany();
+  }
+
   async findOneBank({ id, name }: FindOneBankDto) {
     if (id == null && name == null) {
       return null;

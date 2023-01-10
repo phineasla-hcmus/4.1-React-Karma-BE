@@ -18,5 +18,6 @@ import { HcmusbankService } from './hcmusbank/hcmusbank.service';
     HcmusbankModule,
   ],
   controllers: [ExternalController],
+  exports: [ExternalService],
 })
 export class ExternalModule {}
