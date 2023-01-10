@@ -6,13 +6,16 @@ export class InterbankResponseDto {
   })
   soTK: string;
 
+  @ApiProperty()
+  hoTen: string;
+
   @ApiProperty({
     description: 'Created date',
   })
   ngayTao: string;
 
   @ApiProperty({
-    description: 'signature',
+    description: 'Signature',
   })
   chuKy: string;
 }

@@ -1,3 +1,5 @@
+import { FeeType } from '../../types';
+
 export interface CreateExternalTransactionDto {
   internal: string;
   external: string;
@@ -5,4 +7,5 @@ export interface CreateExternalTransactionDto {
   amount: number;
   fee: number;
   message: string;
+  type: FeeType;
 }

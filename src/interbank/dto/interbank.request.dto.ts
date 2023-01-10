@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsISO8601, IsNotEmpty, IsString } from 'class-validator';
 
-export class InterbankRequestDTO {
+export class InterbankRequestDto {
   @ApiProperty()
   @IsString()
   chuKy: string;
@@ -10,6 +10,11 @@ export class InterbankRequestDTO {
   @IsString()
   @IsNotEmpty()
   soTK: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  tenNH: string;
 
   @ApiProperty()
   @IsISO8601()

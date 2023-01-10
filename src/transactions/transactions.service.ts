@@ -203,6 +203,7 @@ export class TransactionsService {
         soTien: dto.amount,
         phiCK: dto.amount,
         noiDungCK: dto.message,
+        loaiCK: dto.type,
         nganHangLK: {
           connect: { tenNH: dto.bank },
         },

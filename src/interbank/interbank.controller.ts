@@ -14,7 +14,6 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -31,7 +30,7 @@ import {
   ApiPaginatedResponse,
 } from '../swagger/swagger.decorator';
 
-import { InterbankRequestDTO } from './dto/interbank.request.dto';
+import { InterbankRequestDto } from './dto/interbank.request.dto';
 import {
   InterbankResponseDto,
   InterbankTransferResponseDto,
@@ -58,7 +57,7 @@ export class InterbankController {
     type: InterbankResponseDto,
     description: 'Successfully fetched an interbank account info',
   })
-  async getAccount(@Body() body: InterbankRequestDTO) {
+  async getAccount(@Body() body: InterbankRequestDto) {
     const banksList = await this.interbankService.getBanksList();
     if (!banksList || banksList.length === 0) {
       throw new NotFoundException({
