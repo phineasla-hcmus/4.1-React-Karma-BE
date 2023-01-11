@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -21,6 +22,27 @@ export class UserService {
     private otpService: TransactionOtpService,
     private transactionService: TransactionsService,
   ) {}
+
+  /**
+   * Also include info from payment account
+   */
+  async getInfo(maTK: number) {
+    const [info, paymentInfo] = await Promise.all([
+      this.prismaService.khachHang.findUnique({
+        where: { maTK: maTK },
+      }),
+      this.prismaService.taiKhoanThanhToan.findFirst({
+        where: { maTK: maTK },
+      }),
+    ]).catch((e) => {
+      console.error(e);
+      throw new InternalServerErrorException({
+        errorId: 'database_error',
+        message: `Cannot get info for ${maTK}`,
+      });
+    });
+    return { ...info, taiKhoanThanhToan: paymentInfo };
+  }
 
   async transfer(transferDto: LocalTransferDto) {
     const otp = await this.otpService.findOne(transferDto.soTK);

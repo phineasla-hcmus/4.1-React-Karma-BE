@@ -1,10 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, NotFoundException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import { JwtUser } from '../common/decorators';
+import { JwtUserDto } from '../jwt/jwt.dto';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
+import { InfoResponseDto } from './dto/info.response.dto';
 import { LocalTransferDto } from './dto/transfer.dto';
-import { TransferResponseDto } from './dto/transfer.response.dto';
+import { LocalTransferResponseDto } from './dto/transfer.response.dto';
 import { UserService } from './user.service';
 
 @ApiTags('user')
@@ -12,8 +15,22 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('info')
+  @ApiOkWrappedResponse({ type: InfoResponseDto })
+  async getInfo(@JwtUser() user: JwtUserDto) {
+    const { maTK } = user;
+    const data = await this.userService.getInfo(maTK);
+    if (!data) {
+      throw new NotFoundException({
+        errorId: 'user_not_found',
+        message: `Cannot get info for ${maTK}`,
+      });
+    }
+    return { data };
+  }
+
   @Post('transfer')
-  @ApiOkWrappedResponse({ type: TransferResponseDto })
+  @ApiOkWrappedResponse({ type: LocalTransferResponseDto })
   async transfer(@Body() transferDto: LocalTransferDto) {
     try {
       const data = await this.userService.transfer(transferDto);
