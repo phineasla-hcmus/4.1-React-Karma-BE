@@ -1,5 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+class PaymentInfoResponseDto {
+  @ApiProperty()
+  soTK: string;
+
+  @ApiProperty()
+  soDu: number;
+
+  @ApiProperty()
+  maTK: number;
+
+  @ApiProperty()
+  hoatDong: boolean;
+}
+
 export class InfoResponseDto {
   @ApiProperty()
   hoTen: string;
@@ -15,4 +29,7 @@ export class InfoResponseDto {
 
   @ApiProperty()
   soDu: number;
+
+  @ApiProperty({ type: PaymentInfoResponseDto })
+  taiKhoanThanhToan: PaymentInfoResponseDto;
 }
