@@ -14,6 +14,7 @@ import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module'
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UserModule } from './user/user.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     CryptographyModule,
+    NotificationModule,
   ],
   providers: [
     {
