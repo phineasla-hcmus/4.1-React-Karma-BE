@@ -117,6 +117,26 @@ export class HcmusbankService {
     }
     const data = this.transformPayload(payload);
     const signature = await this.sign(data);
+    // Example response
+    // {
+    //   data: {
+    //     message: 'success',
+    //     from: '8768330872',
+    //     to: {
+    //       id: '2a816c8d-ccdf-48bc-97eb-02762ae86567',
+    //       accountNumber: '7403340318',
+    //       lastName: 'Herman',
+    //       firstName: 'Delphia'
+    //     },
+    //     transaction: {
+    //       id: '830161336125554689',
+    //       amount: '49999',
+    //       fromCustomerId: null,
+    //       toCustomerId: '2a816c8d-ccdf-48bc-97eb-02762ae86567',
+    //       recipientId: null
+    //     }
+    //   }
+    // }
     const res = await this.axiosService
       .post(`${this.baseUrl}/api/external/deposit`, {
         data,
