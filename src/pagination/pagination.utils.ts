@@ -4,7 +4,7 @@ export const formatResponse = (
   pagination: PaginationDto,
   total: number,
   lastPage: number,
-  data: any,
+  data: any[],
   resource: string,
 ) => {
   const baseUrl = process.env.BASE_URL;

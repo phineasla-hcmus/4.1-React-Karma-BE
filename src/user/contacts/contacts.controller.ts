@@ -23,7 +23,7 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
 @ApiTags('user/contacts')
-@Controller('contacts')
+@Controller('user/contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 
