@@ -15,3 +15,7 @@ export const ACCESS_TOKEN_TTL = 60 * 15; // 15 minutes
 export const HCMUSBANK_TTL = 5 * 60 * 1000;
 
 export const API_TIMEOUT = 60 * 15; // 15 minutes
+
+export const EVENT_REMINDER_CREATED = 'reminder.created';
+export const EVENT_REMINDER_CONFIRMED = 'reminder.confirmed';
+export const EVENT_REMINDER_CANCELLED = 'reminder.cancelled';

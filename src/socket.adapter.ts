@@ -16,15 +16,15 @@ export class SocketAdapter extends IoAdapter {
 
   private authMiddleware(socket: Socket, next: (err?: Error) => void) {
     const bearer = 'Bearer ';
-    // const bearerToken: string = socket.handshake.auth.token;
-    // const token: string | false =
-    //   bearerToken?.startsWith(bearer) &&
-    //   bearerToken.substring(bearer.length, bearerToken.length);
-    // const user = verify(
-    //   token,
-    //   this.config.getOrThrow('AT_SECRET'),
-    // ) as JwtPayloadDto;
-    const user = socket.handshake.auth.token;
+    const bearerToken: string = socket.handshake.auth.token;
+    const token: string | false =
+      bearerToken?.startsWith(bearer) &&
+      bearerToken.substring(bearer.length, bearerToken.length);
+    const user = verify(
+      token,
+      this.config.getOrThrow('AT_SECRET'),
+    ) as JwtPayloadDto;
+
     if (!user) {
       next(
         new UnauthorizedException({

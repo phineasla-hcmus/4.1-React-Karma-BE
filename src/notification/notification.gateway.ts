@@ -1,36 +1,19 @@
-import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-
-import { NotificationService } from './notification.service';
-import { NotificationClientStoreService } from './notificationClientStore.service';
+import { Logger } from '@nestjs/common';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 
 @WebSocketGateway(3005, { cors: true })
-export class NotificationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(
-    private readonly notificationService: NotificationService,
-    private readonly clientStoreService: NotificationClientStoreService,
-  ) {}
+export class NotificationGateway {
+  @WebSocketServer() server: Server;
+  private readonly logger: Logger = new Logger(NotificationGateway.name);
 
-  async handleConnection(client: Socket, ...args: any[]) {
-    // const bearer = 'Bearer ';
-    // const header = client.handshake.headers.authorization;
-    // const token: string | false =
-    //   header?.startsWith(bearer) &&
-    //   header.substring(bearer.length, header.length);
-    // const user = token && (await this.notificationService.authenticate(token));
-    // this.clientStoreService.add(user.maTK, client);
-    console.log(client.data);
+  emit(event: string, userId: number, payload: object) {
+    return this.server.to(String(userId)).emit(event, payload, (res) => {
+      this.logger.verbose(`${event} - ${userId}`);
+    });
   }
 
-  handleDisconnect(client: Socket) {
-    throw new Error('Method not implemented.');
+  emitMany(event: string, userIds: number[], payload: object) {
+    return userIds.map((id) => this.emit(event, id, payload));
   }
 }
