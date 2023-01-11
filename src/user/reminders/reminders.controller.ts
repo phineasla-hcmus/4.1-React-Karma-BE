@@ -62,6 +62,7 @@ export class RemindersController {
    */
   @Patch()
   @ApiOperation({ summary: 'Checkout a reminder' })
+  @ApiOkWrappedResponse({ type: OmitType(Reminder, ['noiDungXoa'] as const) })
   @ApiQuery({ name: 'maNN', description: 'Reminder ID' })
   async confirm(
     @JwtUser() user: JwtUserDto,
@@ -70,6 +71,7 @@ export class RemindersController {
   ) {
     const { maTK } = user;
     const data = await this.remindersService.confirm(maTK, maNN, dto);
+    return { data };
   }
 
   @Delete(':maNN')
@@ -91,6 +93,7 @@ export class RemindersController {
     if (reminder.trangThai === TrangThaiNhacNo.done) {
       return { data: reminder };
     }
-    return this.remindersService.cancel(maNN, dto);
+    const data = await this.remindersService.cancel(maNN, dto);
+    return { data };
   }
 }
