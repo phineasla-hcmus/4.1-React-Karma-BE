@@ -22,6 +22,7 @@ import {
 } from '../../swagger/swagger.decorator';
 
 import { CancelReminderDto } from './dto/cancel-reminder.dto';
+import { ConfirmReminderDto } from './dto/confirm-reminder.dto';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { FindRemindersDto } from './dto/find-reminders.dto';
 import { Reminder } from './entities/reminder.entity';
@@ -56,10 +57,19 @@ export class RemindersController {
     return this.remindersService.findAllWithPagination(maTK, pagination, dto);
   }
 
+  /**
+   * Local transfer + mark reminder as DONE
+   */
   @Patch()
   @ApiOperation({ summary: 'Checkout a reminder' })
-  confirm(@JwtUser() user: JwtUserDto) {
+  @ApiQuery({ name: 'maNN', description: 'Reminder ID' })
+  async confirm(
+    @JwtUser() user: JwtUserDto,
+    @Param('maNN', ParseIntPipe) maNN: number,
+    @Body() dto: ConfirmReminderDto,
+  ) {
     const { maTK } = user;
+    const data = await this.remindersService.confirm(maTK, maNN, dto);
   }
 
   @Delete(':maNN')

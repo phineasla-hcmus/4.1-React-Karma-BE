@@ -15,6 +15,15 @@ export class PaymentAccountsService {
     });
   }
 
+  /**
+   * Find payment account belongs to an account
+   */
+  async findFirst(soTK: string, maTK: number) {
+    return this.prismaService.taiKhoanThanhToan.findFirst({
+      where: { soTK: soTK, maTK: maTK },
+    });
+  }
+
   async findOneInfo(soTK: string) {
     const user = await this.prismaService.taiKhoanThanhToan.findFirst({
       select: {

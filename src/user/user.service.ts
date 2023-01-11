@@ -54,7 +54,7 @@ export class UserService {
     return this.prismaService.$transaction(async (tx) => {
       await this.otpService.delete(otp.soTK, tx);
       // Shouldn't throw P2018 because we already checked payment accounts are valid
-      await this.transactionService.create(
+      const transaction = await this.transactionService.create(
         {
           sender: transferDto.soTK,
           receiver: transferDto.nguoiNhan,
@@ -66,21 +66,24 @@ export class UserService {
         tx,
       );
       const senderFee = transferDto.loaiCK === FeeType.Sender ? FEE : 0;
-      await this.paymentAccountService.decreaseBalance(
-        {
-          soTK: transferDto.soTK,
-          amount: transferDto.soTien + senderFee,
-        },
-        tx,
-      );
       const receiverFee = transferDto.loaiCK === FeeType.Receiver ? FEE : 0;
-      await this.paymentAccountService.increaseBalance(
-        {
-          soTK: transferDto.nguoiNhan,
-          amount: transferDto.soTien - receiverFee,
-        },
-        tx,
-      );
+      await Promise.all([
+        this.paymentAccountService.decreaseBalance(
+          {
+            soTK: transferDto.soTK,
+            amount: transferDto.soTien + senderFee,
+          },
+          tx,
+        ),
+        this.paymentAccountService.increaseBalance(
+          {
+            soTK: transferDto.nguoiNhan,
+            amount: transferDto.soTien - receiverFee,
+          },
+          tx,
+        ),
+      ]);
+      return transaction;
     });
   }
 }

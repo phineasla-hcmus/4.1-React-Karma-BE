@@ -2,20 +2,28 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Prisma, TrangThaiNhacNo } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 import { formatResponse, PaginationDto } from '../../pagination';
+import { PaymentAccountsService } from '../../paymentAccounts/paymentAccounts.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../user.service';
 
 import { CancelReminderDto } from './dto/cancel-reminder.dto';
+import { ConfirmReminderDto } from './dto/confirm-reminder.dto';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { FindRemindersDto, ReminderType } from './dto/find-reminders.dto';
 
 @Injectable()
 export class RemindersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private paymentAccountsService: PaymentAccountsService,
+    private userService: UserService,
+  ) {}
 
   async create(maTK: number, createReminderDto: CreateReminderDto) {
     // TODO realtime notification
@@ -91,6 +99,27 @@ export class RemindersService {
 
   async findOne(maNN: number) {
     return this.prismaService.nhacNo.findUnique({ where: { maNN: maNN } });
+  }
+
+  async confirm(maTK: number, maNN: number, dto: ConfirmReminderDto) {
+    // TODO realtime notification
+    const reminder = await this.findOne(maNN);
+    const transaction = await this.userService.transfer({
+      otp: dto.otp,
+      soTK: dto.soTK,
+      noiDung: dto.noiDung,
+      loaiCK: dto.loaiCK,
+      soTien: reminder.soTien,
+      nguoiNhan: reminder.soTKNguoiGui,
+    });
+    return this.prismaService.nhacNo.update({
+      where: { maNN: maNN },
+      data: {
+        ngayThanhToan: new Date(),
+        trangThai: TrangThaiNhacNo.done,
+        giaoDichLienKet: { connect: { maCK: transaction.maCK } },
+      },
+    });
   }
 
   async cancel(maNN: number, dto: CancelReminderDto) {
