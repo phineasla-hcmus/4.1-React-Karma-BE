@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { FeeType } from '../../types';
 
-export class TransferResponseDto {
+export class LocalTransferResponseDto {
   @ApiProperty()
   maCK: string;
 
