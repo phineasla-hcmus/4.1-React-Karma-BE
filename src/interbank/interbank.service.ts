@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -32,10 +34,6 @@ export class InterbankService {
       this.logger.error(e);
     }
     throw e;
-  }
-
-  async getPaymentAccountInfo(soTK: string) {
-    return await this.paymentAccountService.findOneInfo(soTK);
   }
 
   async findAllWithoutPagination() {
@@ -188,34 +186,6 @@ export class InterbankService {
           stack: e.stack,
         });
       }
-    }
-  }
-
-  async findStatistic() {
-    try {
-      const [sent, received] = await Promise.all([
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
-          },
-          where: {
-            soTien: { lt: 0 },
-          },
-        }),
-        this.prismaService.chuyenKhoanNganHangNgoai.aggregate({
-          _sum: {
-            soTien: true,
-          },
-          where: {
-            soTien: {
-              gt: 0,
-            },
-          },
-        }),
-      ]);
-      return { soTienGui: -sent._sum.soTien, soTienNhan: received._sum.soTien };
-    } catch (e) {
-      this.handleError(e);
     }
   }
 }

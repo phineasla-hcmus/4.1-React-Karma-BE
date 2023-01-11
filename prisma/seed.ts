@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
+import * as fs from 'fs/promises';
 import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 async function main() {
@@ -130,6 +131,13 @@ async function main() {
       }
     }
   }
+  const key = await fs.readFile('secret/request.public.pem', 'utf-8');
+  await prisma.nganHangLienKet.create({
+    data: {
+      tenNH: 'HCMUSBank',
+      kPublic: key,
+    },
+  });
 }
 
 main()

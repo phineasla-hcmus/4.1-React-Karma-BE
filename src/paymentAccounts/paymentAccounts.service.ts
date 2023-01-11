@@ -73,4 +73,14 @@ export class PaymentAccountsService {
       },
     });
   }
+
+  async getInfoByAccountNo(accountNo: string) {
+    const account = await this.prismaService.taiKhoanThanhToan.findUnique({
+      where: {
+        soTK: accountNo,
+      },
+    });
+
+    return account;
+  }
 }

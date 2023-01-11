@@ -1,26 +1,25 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+import { FindOneBankDto } from './dto/find-one-bank.dto';
 
 @Injectable()
 export class BanksService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAll() {
-    try {
-      const data = await this.prismaService.nganHangLienKet.findMany();
-      return data.map(({ ...props }) => ({
-        ...props,
-        id: props.maNH,
-      }));
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new InternalServerErrorException({
-          errorId: e.name,
-          message: e.message,
-          stack: e.stack,
-        });
-      }
+  async findOne({ id, name }: FindOneBankDto) {
+    if (id == null && name == null) {
+      return null;
     }
+    return this.prismaService.nganHangLienKet.findUnique({
+      where: { maNH: id, tenNH: name },
+    });
+  }
+
+  async findAll() {
+    return this.prismaService.nganHangLienKet.findMany({
+      select: { maNH: true, tenNH: true },
+    });
   }
 }
