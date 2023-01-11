@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Prisma, TrangThaiNhacNo } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
