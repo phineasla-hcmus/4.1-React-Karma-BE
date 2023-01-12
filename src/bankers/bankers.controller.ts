@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -30,12 +31,17 @@ import {
 } from './dto/banker.response.dto';
 import { CreateBankerDto } from './dto/create-banker.dto';
 import { UpdateBankerDto } from './dto/update-banker.dto';
+import { Role } from '../common/decorators';
+import { VaiTro } from '@prisma/client';
+import { RoleGuard } from '../common/guards';
 
 @ApiTags('bankers')
 @Controller('bankers')
 export class BankersController {
   constructor(private readonly bankersService: BankersService) {}
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiOperation({
     summary: 'Create a banker',
@@ -52,6 +58,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of bankers',
@@ -69,6 +77,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiOperation({
     summary: 'Fetch a paginated list of bankers',
@@ -83,6 +93,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get(':maTK')
   @ApiOperation({
     summary: 'Fetch detailed data of a banker',
@@ -103,6 +115,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Patch(':maTK')
   @ApiOperation({
     summary: 'Update detail info of a banker',
@@ -119,6 +133,8 @@ export class BankersController {
     return this.bankersService.update(id, updateBankerDto);
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Delete(':maTK')
   @ApiOperation({
     summary: 'Delete a banker',
@@ -132,6 +148,8 @@ export class BankersController {
     return { data: { status: HttpStatus.OK } };
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Patch(':id/recharge')
   @ApiOperation({
     summary: 'Recharge money for a user',

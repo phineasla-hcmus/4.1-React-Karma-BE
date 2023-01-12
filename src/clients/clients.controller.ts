@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -30,12 +31,17 @@ import {
 } from './dto/client.response.dto';
 import { CreateUserDto } from './dto/create-client.dto';
 import { UpdateUserDto } from './dto/update-client.dto';
+import { Role } from '../common/decorators';
+import { VaiTro } from '@prisma/client';
+import { RoleGuard } from '../common/guards';
 
 @ApiTags('clients')
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiOperation({
     summary: 'Create a client',
@@ -52,6 +58,8 @@ export class ClientsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of clients',
@@ -66,6 +74,8 @@ export class ClientsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiOperation({
     summary: 'Fetch a paginated list of clients',
@@ -80,6 +90,8 @@ export class ClientsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get(':maTK')
   @ApiOperation({
     summary: 'Fetch detailed data of a user',
@@ -97,6 +109,8 @@ export class ClientsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Patch(':maTK')
   @ApiOperation({
     summary: 'Update detail info of a user',
@@ -113,6 +127,8 @@ export class ClientsController {
     return this.clientsService.update(id, updateUserDto);
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Delete(':maTK')
   @ApiOperation({
     summary: 'Delete a user',

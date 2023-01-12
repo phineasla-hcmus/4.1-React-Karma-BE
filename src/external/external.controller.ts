@@ -1,4 +1,10 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  NotFoundException,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import {
@@ -10,11 +16,16 @@ import { FindOneExternalDto } from './dto/find-one-external.dto';
 import { TransferDto, TransferResponseDto } from './dto/transfer.dto';
 import { ExternalService } from './external.service';
 import { FindOneAccountResponseDto } from './hcmusbank/dto/find-one-account-response.dto';
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
+import { VaiTro } from '@prisma/client';
 @ApiTags('external')
 @Controller('external')
 export class ExternalController {
   constructor(private externalService: ExternalService) {}
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post('account')
   @ApiOperation({
     summary: 'Fetch an account info of HCMUSBank',
@@ -37,6 +48,8 @@ export class ExternalController {
     });
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post('transfer')
   @ApiOperation({
     summary: 'Interbank transfer',
