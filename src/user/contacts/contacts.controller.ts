@@ -10,7 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../../common/decorators';
+import { RoleGuard } from '../../common/guards';
 import { JwtUser } from '../../jwt/jwt.decorator';
 import { JwtUserDto } from '../../jwt/jwt.dto';
 import {
@@ -22,9 +25,6 @@ import { ContactsService } from './contacts.service';
 import { ContactResponseDto } from './dto/contact.response.dto';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
-import { Role } from '../../common/decorators';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../../common/guards';
 
 @ApiTags('user/contacts')
 @Controller('user/contacts')

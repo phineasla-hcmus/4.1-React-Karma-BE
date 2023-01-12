@@ -16,8 +16,12 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
+import { JwtUser, Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
+import { JwtPayloadDto } from '../jwt/jwt.dto';
 import { Pagination, PaginationDto } from '../pagination';
 import {
   ApiOkPaginatedResponse,
@@ -31,14 +35,24 @@ import {
 } from './dto/banker.response.dto';
 import { CreateBankerDto } from './dto/create-banker.dto';
 import { UpdateBankerDto } from './dto/update-banker.dto';
-import { Role } from '../common/decorators';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../common/guards';
 
 @ApiTags('bankers')
 @Controller('bankers')
 export class BankersController {
   constructor(private readonly bankersService: BankersService) {}
+
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
+  @Patch('recharge')
+  @ApiOperation({
+    summary: 'Recharge money for a user',
+  })
+  @ApiOkResponse({
+    description: 'Successfully recharged money for a user',
+  })
+  recharge(@Body() rechargeDto: RechargeDto, @JwtUser() user: JwtPayloadDto) {
+    return this.bankersService.recharge(user.maTK, rechargeDto);
+  }
 
   @Role(VaiTro.Admin)
   @UseGuards(RoleGuard)
@@ -146,22 +160,5 @@ export class BankersController {
   async remove(@Param('maTK') id: string) {
     await this.bankersService.remove(+id);
     return { data: { status: HttpStatus.OK } };
-  }
-
-  @Role(VaiTro.Banker)
-  @UseGuards(RoleGuard)
-  @Patch(':id/recharge')
-  @ApiOperation({
-    summary: 'Recharge money for a user',
-  })
-  @ApiParam({ name: 'maTK', description: 'Mã tài khoản', type: 'number' })
-  @ApiOkResponse({
-    description: 'Successfully recharged money for a user',
-  })
-  recharge(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() rechargeDto: RechargeDto,
-  ) {
-    return this.bankersService.recharge(id, rechargeDto);
   }
 }

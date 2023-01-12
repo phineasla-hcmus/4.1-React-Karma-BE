@@ -6,13 +6,12 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
 import { BanksService } from './banks.service';
 import { BankResponseDto } from './dto/bank.response.dto';
-import { VaiTro } from '@prisma/client';
-import { Role } from '../common/decorators';
-import { RoleGuard } from '../common/guards';
 
 @Controller('banks')
 export class BanksController {

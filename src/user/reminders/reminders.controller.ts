@@ -14,6 +14,8 @@ import {
 import { ApiOperation, ApiQuery, ApiTags, OmitType } from '@nestjs/swagger';
 import { TrangThaiNhacNo, VaiTro } from '@prisma/client';
 
+import { Role } from '../../common/decorators';
+import { RoleGuard } from '../../common/guards';
 import { JwtUser } from '../../jwt/jwt.decorator';
 import { JwtUserDto } from '../../jwt/jwt.dto';
 import { Pagination, PaginationDto } from '../../pagination';
@@ -28,8 +30,6 @@ import { CreateReminderDto } from './dto/create-reminder.dto';
 import { FindRemindersDto } from './dto/find-reminders.dto';
 import { Reminder } from './entities/reminder.entity';
 import { RemindersService } from './reminders.service';
-import { Role } from '../../common/decorators';
-import { RoleGuard } from '../../common/guards';
 
 @ApiTags('user/reminders')
 @Controller('user/reminders')
