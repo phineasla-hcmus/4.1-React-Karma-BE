@@ -1,5 +1,4 @@
 import * as crypto from 'crypto';
-import * as fs from 'fs/promises';
 
 import { Inject, Injectable } from '@nestjs/common';
 

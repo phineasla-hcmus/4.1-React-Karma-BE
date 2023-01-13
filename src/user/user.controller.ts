@@ -7,8 +7,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
 import { JwtUser, Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { JwtUserDto } from '../jwt/jwt.dto';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
@@ -16,8 +18,6 @@ import { InfoResponseDto } from './dto/info.response.dto';
 import { LocalTransferDto } from './dto/transfer.dto';
 import { LocalTransferResponseDto } from './dto/transfer.response.dto';
 import { UserService } from './user.service';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../common/guards';
 
 @ApiTags('user')
 @Controller('user')

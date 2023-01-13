@@ -12,7 +12,10 @@ import {
   ApiParam,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { CryptographyService } from '../cryptography/cryptography.service';
 import { Pagination, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
@@ -24,9 +27,6 @@ import {
 import { InterbankTransactionResponseDto } from './dto/interbank.response.dto';
 import { InterbankTransactionQueryDto } from './dto/query.dto';
 import { InterbankService } from './interbank.service';
-import { Role } from '../common/decorators';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../common/guards';
 
 @Controller('interbank')
 export class InterbankController {
