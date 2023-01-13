@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -91,5 +91,30 @@ export class PaymentAccountsService {
     });
 
     return account;
+  }
+
+  async deactivatePaymentAccount(soTK: string) {
+    const isActive = await this.prismaService.taiKhoanThanhToan.findUnique({
+      select: {
+        hoatDong: true,
+      },
+      where: {
+        soTK: soTK,
+      },
+    });
+    if (!isActive) {
+      throw new ForbiddenException({
+        errorId: HttpStatus.FORBIDDEN,
+        message: 'Payment account is inactive',
+      });
+    }
+    await this.prismaService.taiKhoanThanhToan.update({
+      where: {
+        soTK: soTK,
+      },
+      data: {
+        hoatDong: false,
+      },
+    });
   }
 }

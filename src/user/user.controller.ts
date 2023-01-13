@@ -29,6 +29,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private transactionsService: TransactionsService,
+    private paymentAccountsService: PaymentAccountsService,
   ) {}
 
   @Role(VaiTro.User)
@@ -81,6 +82,19 @@ export class UserController {
   })
   async deactivateAccount(@JwtUser() user: JwtUserDto) {
     await this.userService.deactivateAccount(user.maTK);
+    return { data: { status: HttpStatus.OK } };
+  }
+
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
+  @Patch('/payment-account/deactivate')
+  @ApiOperation({
+    summary: "Deactivate uses's payment account ",
+  })
+  async deactivatePaymentAccount(@JwtUser() user: JwtUserDto) {
+    const paymentAccount = await this.userService.getInfo(user.maTK);
+    const soTK = paymentAccount.taiKhoanThanhToan.soTK;
+    await this.paymentAccountsService.deactivatePaymentAccount(soTK);
     return { data: { status: HttpStatus.OK } };
   }
 }
