@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { JwtUser, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
@@ -15,6 +16,7 @@ import { JwtPayloadDto } from '../jwt/jwt.dto';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

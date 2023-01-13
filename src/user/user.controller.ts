@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, NotFoundException } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { JwtUser } from '../common/decorators';
 import { JwtUserDto } from '../jwt/jwt.dto';
@@ -30,7 +30,12 @@ export class UserController {
   }
 
   @Post('transfer')
-  @ApiOkWrappedResponse({ type: LocalTransferResponseDto })
+  @ApiOperation({
+    summary: 'User local transfer (transfer in only Karma Bank)',
+  })
+  @ApiOkWrappedResponse({
+    type: LocalTransferResponseDto,
+  })
   async transfer(@Body() transferDto: LocalTransferDto) {
     try {
       const data = await this.userService.transfer(transferDto);
