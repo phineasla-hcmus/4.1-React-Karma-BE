@@ -101,10 +101,10 @@ model nganHangLienKet {
 
 model nhacNo {
   maNN              Int               @id @default(autoincrement()) @map("MANN")
-  // Reminder author
-  nguoiGui          Int               @map("NGUOIGUI")
+  // Reminder author - payee
   soTKNguoiGui      String            @map("SOTKNGUOIGUI")
-  nguoiNhan         Int               @map("NGUOINHAN")
+  // Payer
+  soTKNguoiNhan     String            @map("NGUOINHAN")
   soTien            Int               @map("SOTIEN")
   ngayTao           DateTime          @default(now()) @map("NGAYTAO")
   noiDungNN         String?           @map("NOIDUNGNN")
@@ -113,9 +113,8 @@ model nhacNo {
   noiDungXoa        String?           @map("NOIDUNGXOA")
   chuyenKhoan       Int?              @unique @map("CHUYENKHOAN")
   giaoDichLienKet   chuyenKhoanNoiBo? @relation("NHACNO_GIAODICHLIENKET", fields: [chuyenKhoan], references: [maCK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO_CHUYENKHOANNOIBO")
-  taiKhoanNguoiGui  taiKhoan          @relation("NHACNO_NGUOIGUIToTAIKHOAN", fields: [nguoiGui], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO1_TAIKHOAN")
-  taiKhoanThanhToan taiKhoanThanhToan @relation("NHACNO_SOTKNGUOIGUIToTAIKHOANTHANHTOAN", fields: [soTKNguoiGui], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO2_TAIKHOANTHANHTOAN")
-  taiKhoanNguoiNhan taiKhoan          @relation("NHACNO_NGUOINHANToTAIKHOAN", fields: [nguoiNhan], references: [maTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO3_TAIKHOAN")
+  taiKhoanNguoiGui  taiKhoanThanhToan @relation("NHACNO_SOTKNGUOIGUIToTAIKHOANTHANHTOAN", fields: [soTKNguoiGui], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO2_TAIKHOANTHANHTOAN")
+  taiKhoanNguoiNhan taiKhoanThanhToan @relation("NHACNO_SOTKNGUOINHANToTAIKHOANTHANHTOAN", fields: [soTKNguoiNhan], references: [soTK], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHACNO3_TAIKHOANTHANHTOAN")
 
   @@map("NHACNO")
 }
@@ -139,8 +138,6 @@ model taiKhoan {
   refreshToken       String?              @map("REFRESHTOKEN") @db.VarChar(256)
   dsTaiKhoan         danhSachDaLuu[]      @relation("DANHSACHDALUU_MATKToTAIKHOAN")
   dsTaiKhoanNgoai    danhSachNgoaiDaLuu[] @relation("DANHSACHNGOAIDALUU_MATKToTAIKHOAN")
-  dsNhanNo           nhacNo[]             @relation("NHACNO_NGUOIGUIToTAIKHOAN")
-  duocNhacNo         nhacNo[]             @relation("NHACNO_NGUOINHANToTAIKHOAN")
   nhanVien           nhanVien?
   taiKhoanThanhToan  taiKhoanThanhToan?
   khachHang          khachHang?
@@ -163,6 +160,7 @@ model taiKhoanThanhToan {
   thuocDanhSach            danhSachDaLuu[]            @relation("DANHSACHDALUU_NGUOIDUNGToTAIKHOANTHANHTOAN")
   otpChuyenKhoan           otpChuyenKhoan[]
   nhacNo                   nhacNo[]                   @relation("NHACNO_SOTKNGUOIGUIToTAIKHOANTHANHTOAN")
+  duocNhacNo               nhacNo[]                   @relation("NHACNO_SOTKNGUOINHANToTAIKHOANTHANHTOAN")
 
   @@map("TAIKHOANTHANHTOAN")
 }
