@@ -5,6 +5,7 @@ import {
   IsISO8601,
   IsNumberString,
   IsEnum,
+  IsNumber,
 } from 'class-validator';
 
 import { FeeType } from '../../../types';
@@ -47,7 +48,7 @@ export class TransferApiDto extends BaseApiDto {
   nguoiChuyen: string;
 
   @ApiProperty()
-  @IsNumberString()
+  @IsNumber()
   @IsNotEmpty()
   soTien: number;
 
