@@ -18,6 +18,11 @@ import { CreateExternalTransactionDto } from './dto/create-external-transaction.
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
 
+enum Loai {
+  transfer,
+  receive,
+}
+
 @Injectable()
 export class TransactionsService {
   private readonly logger: Logger = new Logger(TransactionsService.name);
@@ -212,5 +217,36 @@ export class TransactionsService {
         },
       },
     });
+  }
+
+  async getTransactions(id: string) {
+    const current = new Date();
+    const prior = new Date(new Date().setDate(current.getDate() - 30));
+    const recvList = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      where: {
+        ngayCK: {
+          gte: prior,
+          lte: current,
+        },
+        nguoiNhan: id,
+      },
+    });
+    recvList.forEach(function (element) {
+      element['loai'] = Loai.receive;
+    });
+    const sendList = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      where: {
+        ngayCK: {
+          gte: prior,
+          lte: current,
+        },
+        nguoiChuyen: id,
+      },
+    });
+    sendList.forEach(function (element) {
+      element['loai'] = Loai.transfer;
+    });
+    const list = [...recvList, ...sendList];
+    return list;
   }
 }
