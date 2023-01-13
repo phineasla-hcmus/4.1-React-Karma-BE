@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -58,7 +59,7 @@ export class ExternalService {
         message: 'Invalid OTP',
       });
     }
-    await Promise.all([
+    const [bank, senderPaymentAccount] = await Promise.all([
       this.banksService.findOne({ name: dto.nganHang }).then((v) => {
         if (v != null) return v;
         throw new NotFoundException({
@@ -74,6 +75,12 @@ export class ExternalService {
         });
       }),
     ]);
+    if (senderPaymentAccount.soDu < dto.soTien) {
+      throw new BadRequestException({
+        errorId: 'insufficient_fund',
+        message: 'Insufficient fund',
+      });
+    }
     switch (dto.nganHang) {
       case 'HCMUSBank': {
         await this.hcmusbankService.transfer({

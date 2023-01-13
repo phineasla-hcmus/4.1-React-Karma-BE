@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -62,7 +63,7 @@ export class UserService {
         message: 'Invalid OTP',
       });
     }
-    await Promise.all(
+    const [senderPaymentAccount] = await Promise.all(
       [transferDto.soTK, transferDto.nguoiNhan].map((id) =>
         this.paymentAccountService.findOne(id).then((v) => {
           if (v != null) return v;
@@ -73,6 +74,12 @@ export class UserService {
         }),
       ),
     );
+    if (senderPaymentAccount.soDu < transferDto.soTien) {
+      throw new BadRequestException({
+        errorId: 'insufficient_fund',
+        message: "you're not rich enough to make this transaction",
+      });
+    }
     return this.prismaService.$transaction(async (tx) => {
       await this.otpService.delete(otp.soTK, tx);
       // Shouldn't throw P2018 because we already checked payment accounts are valid
