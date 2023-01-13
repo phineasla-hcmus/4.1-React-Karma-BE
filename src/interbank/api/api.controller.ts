@@ -31,7 +31,7 @@ export class InterbankApiController {
   }
 
   @Public()
-  @Post('api/transfer')
+  @Post('transfer')
   @ApiOperation({
     summary: 'Transfer balance between banks',
   })

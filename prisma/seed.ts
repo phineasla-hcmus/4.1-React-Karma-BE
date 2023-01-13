@@ -1,10 +1,13 @@
+import * as fs from 'fs/promises';
+
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
-import * as fs from 'fs/promises';
-import * as bcrypt from 'bcrypt';
+import { hashSync } from 'bcrypt';
+
 const prisma = new PrismaClient();
+
 async function main() {
-  const hashed = bcrypt.hashSync('1234', 10);
+  const hashed = hashSync('1234', 10);
 
   //2 Bankers
   for (let i = 1; i < 3; i++) {
