@@ -91,7 +91,7 @@ export class TransactionsController {
       nguoiNhan,
       soTien,
     });
-    this.transactionEmailService.sendEmail(soTK, newOtp.otp);
+    this.transactionEmailService.sendEmail(soTK, nguoiNhan, newOtp.otp);
     return { data: { status: HttpStatus.OK } };
   }
 
