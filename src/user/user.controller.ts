@@ -6,9 +6,9 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { JwtUser, Role } from '../common/decorators';
+import { JwtUser, Public, Role } from '../common/decorators';
 import { JwtUserDto } from '../jwt/jwt.dto';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
@@ -18,11 +18,16 @@ import { LocalTransferResponseDto } from './dto/transfer.response.dto';
 import { UserService } from './user.service';
 import { VaiTro } from '@prisma/client';
 import { RoleGuard } from '../common/guards';
+import { TransactionsService } from '../transactions/transactions.service';
+import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private transactionsService: TransactionsService,
+  ) {}
 
   @Role(VaiTro.User)
   @UseGuards(RoleGuard)
@@ -51,5 +56,18 @@ export class UserController {
     } catch (e) {
       throw e;
     }
+  }
+
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
+  @Get('transactions')
+  @ApiOperation({
+    summary: 'Fetch transactions in last 30 days ',
+  })
+  async getTransactions(@JwtUser() user: JwtUserDto) {
+    const account = await this.userService.getInfo(user.maTK);
+    const accountNum = account.taiKhoanThanhToan.soTK;
+    const data = await this.transactionsService.getTransactions(accountNum);
+    return { data };
   }
 }
