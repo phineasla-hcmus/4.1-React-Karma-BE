@@ -12,21 +12,25 @@ export class TransactionEmailService {
     private readonly clientsService: ClientsService,
   ) {}
 
-  async sendEmail(soTK: string, otp: number) {
+  private censor(source: string, from: number, to: number) {
+    return (
+      source.substring(0, from) + '*'.repeat(to - from) + source.substring(to)
+    );
+  }
+
+  async sendEmail(soTK: string, nguoiNhan: string, otp: number) {
     const user = await this.clientsService.findOneByPaymentAccount(soTK, {
       include: { khachHang: true },
     });
-    const content = `Dear ${user.khachHang.hoTen},
-
-    Please enter this confirmation code to confirm your transaction: 
-    ${otp}
-
-    Thank you!
-    `;
-    return await this.emailService.sendEmail(
+    return this.emailService.sendEmail(
       user.khachHang.email,
       'Verify your transaction',
-      content,
+      'confirm-transaction/index.html',
+      {
+        name: user.khachHang.hoTen,
+        destination: this.censor(nguoiNhan, 0, nguoiNhan.length - 4),
+        code: otp,
+      },
     );
   }
 }
