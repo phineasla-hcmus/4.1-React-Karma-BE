@@ -10,10 +10,6 @@ export class ConfirmReminderDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  soTK: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
   noiDung: string;
 
   @ApiProperty({ enum: FeeType })
