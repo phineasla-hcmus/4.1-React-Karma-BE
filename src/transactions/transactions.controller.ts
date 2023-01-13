@@ -10,6 +10,7 @@ import {
   Post,
   BadRequestException,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -34,6 +35,9 @@ import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
 import { TransactionsService } from './transactions.service';
+import { Role } from '../common/decorators';
+import { VaiTro } from '@prisma/client';
+import { RoleGuard } from '../common/guards';
 
 @ApiTags('transactions')
 @Controller('transactions')
@@ -44,6 +48,8 @@ export class TransactionsController {
     private readonly transactionEmailService: TransactionEmailService,
   ) {}
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post('request')
   @ApiOperation({
     summary: 'Request an OTP before transfer',
@@ -89,6 +95,8 @@ export class TransactionsController {
     return { data: { status: HttpStatus.OK } };
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of transactions',
@@ -103,6 +111,8 @@ export class TransactionsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiOperation({
     summary: 'Fetch a paginated list of transactions',
@@ -131,6 +141,8 @@ export class TransactionsController {
     }
   }
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
   @Get(':maCK')
   @ApiOperation({
     summary: 'Fetch detailed data of a transaction',

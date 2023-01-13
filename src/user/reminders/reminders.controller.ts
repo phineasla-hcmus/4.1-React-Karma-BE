@@ -9,9 +9,10 @@ import {
   Patch,
   ParseIntPipe,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags, OmitType } from '@nestjs/swagger';
-import { TrangThaiNhacNo } from '@prisma/client';
+import { TrangThaiNhacNo, VaiTro } from '@prisma/client';
 
 import { JwtUser } from '../../jwt/jwt.decorator';
 import { JwtUserDto } from '../../jwt/jwt.dto';
@@ -27,12 +28,16 @@ import { CreateReminderDto } from './dto/create-reminder.dto';
 import { FindRemindersDto } from './dto/find-reminders.dto';
 import { Reminder } from './entities/reminder.entity';
 import { RemindersService } from './reminders.service';
+import { Role } from '../../common/decorators';
+import { RoleGuard } from '../../common/guards';
 
 @ApiTags('user/reminders')
 @Controller('user/reminders')
 export class RemindersController {
   constructor(private readonly remindersService: RemindersService) {}
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiOperation({ summary: 'Create reminder' })
   @ApiOkWrappedResponse({ type: OmitType(Reminder, ['noiDungXoa'] as const) })
@@ -45,6 +50,8 @@ export class RemindersController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiOperation({ summary: 'Get list of reminders' })
   @ApiOkPaginatedResponse({ type: Reminder })
@@ -60,6 +67,8 @@ export class RemindersController {
   /**
    * Local transfer + mark reminder as DONE
    */
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Patch()
   @ApiOperation({ summary: 'Checkout a reminder' })
   @ApiOkWrappedResponse({ type: OmitType(Reminder, ['noiDungXoa'] as const) })
@@ -74,6 +83,8 @@ export class RemindersController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Delete(':maNN')
   @ApiOperation({ summary: 'Cancel reminder' })
   @ApiOkWrappedResponse({ type: Reminder })
