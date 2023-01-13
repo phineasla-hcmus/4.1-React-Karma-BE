@@ -37,6 +37,20 @@ export class RemindersService {
     private userService: UserService,
   ) {}
 
+  private didReceiveError(e: unknown) {
+    if (e instanceof Error) {
+      return new InternalServerErrorException({
+        errorId: 'database_error',
+        message: e.message,
+        stack: e.stack,
+      });
+    }
+    return new InternalServerErrorException({
+      errorId: 'i_dont_know',
+      message: 'Good luck debuging this',
+    });
+  }
+
   private async findOneInfoByPayId(soTK: string) {
     return this.prismaService.khachHang.findFirst({
       where: {
@@ -47,6 +61,17 @@ export class RemindersService {
   }
 
   async create(maTK: number, createReminderDto: CreateReminderDto) {
+    const paymentAccount = await this.paymentAccountsService
+      .findFirst(createReminderDto.soTK, maTK)
+      .catch((e) => {
+        throw this.didReceiveError(e);
+      });
+    if (!paymentAccount) {
+      throw new BadRequestException({
+        errorId: 'payment_account_not_found',
+        message: `Cannot find payment account with ${createReminderDto.soTK}`,
+      });
+    }
     const reminder = await this.prismaService.nhacNo
       .create({
         data: {
@@ -68,11 +93,7 @@ export class RemindersService {
             message: 'Invalid receiver/sender IDs',
           });
         }
-        throw new InternalServerErrorException({
-          errorId: 'database_error',
-          message: e.message,
-          stack: e.stack,
-        });
+        throw this.didReceiveError(e);
       });
     this.notifyCreated(reminder);
     return reminder;
@@ -119,11 +140,7 @@ export class RemindersService {
         take: pagination.size,
       }),
     ]).catch((e) => {
-      throw new InternalServerErrorException({
-        errorId: 'database_error',
-        message: e.message,
-        stack: e.stack,
-      });
+      throw this.didReceiveError(e);
     });
     const lastPage = Math.ceil(total / pagination.size);
     return formatResponse(
