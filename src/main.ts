@@ -4,12 +4,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import monitor from 'express-status-monitor';
 
 import { AppModule } from './app.module';
+import { SocketAdapter } from './socket.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(monitor());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  const socketAdapter = new SocketAdapter(app);
+  app.useWebSocketAdapter(socketAdapter);
 
   const config = new DocumentBuilder()
     .setTitle('KARMA BANK')

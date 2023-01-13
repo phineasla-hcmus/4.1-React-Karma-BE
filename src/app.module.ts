@@ -10,6 +10,7 @@ import { AtGuard } from './common/guards';
 import { CryptographyModule } from './cryptography/cryptography.module';
 import { ExternalModule } from './external/external.module';
 import { InterbankModule } from './interbank/interbank.module';
+import { NotificationModule } from './notification/notification.module';
 import { PaymentAccountsModule } from './paymentAccounts/paymentAccounts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
@@ -31,6 +32,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     CryptographyModule,
+    NotificationModule,
   ],
   providers: [
     {
