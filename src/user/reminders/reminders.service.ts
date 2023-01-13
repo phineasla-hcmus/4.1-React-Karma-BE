@@ -54,7 +54,7 @@ export class RemindersService {
           noiDungNN: createReminderDto.noiDung,
           ngayTao: new Date(),
           taiKhoanNguoiGui: {
-            connect: { maTK: maTK, soTK: createReminderDto.soTK },
+            connect: { soTK: createReminderDto.soTK },
           },
           taiKhoanNguoiNhan: {
             connect: { soTK: createReminderDto.soTKNguoiNhan },
