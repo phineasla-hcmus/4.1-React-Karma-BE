@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { NotificationModule } from '../notification/notification.module';
 import { PaymentAccountsModule } from '../paymentAccounts/paymentAccounts.module';
 import { TransactionsModule } from '../transactions/transactions.module';
 
@@ -14,6 +15,6 @@ import { UserService } from './user.service';
   // Child routes (controllers) must be placed before parent routes
   controllers: [ContactsController, RemindersController, UserController],
   providers: [ContactsService, RemindersService, UserService],
-  imports: [PaymentAccountsModule, TransactionsModule],
+  imports: [PaymentAccountsModule, TransactionsModule, NotificationModule],
 })
 export class UserModule {}

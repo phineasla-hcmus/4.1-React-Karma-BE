@@ -21,7 +21,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { REQUEST_TRANSACTION_OTP_RATE } from '../constants';
 import { Pagination, PaginationDto } from '../pagination';
 import {
@@ -35,9 +38,6 @@ import { TransactionQueryDTO } from './dto/transactions.query.dto';
 import { TransactionEmailService } from './transactionEmail.service';
 import { TransactionOtpService } from './transactionOtp.service';
 import { TransactionsService } from './transactions.service';
-import { Role } from '../common/decorators';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../common/guards';
 
 @ApiTags('transactions')
 @Controller('transactions')

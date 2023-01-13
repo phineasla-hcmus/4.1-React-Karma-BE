@@ -16,7 +16,10 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { Pagination, PaginationDto } from '../pagination';
 import {
   ApiOkWrappedResponse,
@@ -31,9 +34,6 @@ import {
 } from './dto/client.response.dto';
 import { CreateUserDto } from './dto/create-client.dto';
 import { UpdateUserDto } from './dto/update-client.dto';
-import { Role } from '../common/decorators';
-import { VaiTro } from '@prisma/client';
-import { RoleGuard } from '../common/guards';
 
 @ApiTags('clients')
 @Controller('clients')
