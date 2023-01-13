@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -15,8 +16,12 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
 import { RechargeDto } from '../bankers/dto/recharge.dto';
+import { JwtUser, Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
+import { JwtPayloadDto } from '../jwt/jwt.dto';
 import { Pagination, PaginationDto } from '../pagination';
 import {
   ApiOkPaginatedResponse,
@@ -36,6 +41,21 @@ import { UpdateBankerDto } from './dto/update-banker.dto';
 export class BankersController {
   constructor(private readonly bankersService: BankersService) {}
 
+  @Role(VaiTro.Banker)
+  @UseGuards(RoleGuard)
+  @Patch('recharge')
+  @ApiOperation({
+    summary: 'Recharge money for a user',
+  })
+  @ApiOkResponse({
+    description: 'Successfully recharged money for a user',
+  })
+  recharge(@Body() rechargeDto: RechargeDto, @JwtUser() user: JwtPayloadDto) {
+    return this.bankersService.recharge(user.maTK, rechargeDto);
+  }
+
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiOperation({
     summary: 'Create a banker',
@@ -52,6 +72,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of bankers',
@@ -69,6 +91,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiOperation({
     summary: 'Fetch a paginated list of bankers',
@@ -83,6 +107,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get(':maTK')
   @ApiOperation({
     summary: 'Fetch detailed data of a banker',
@@ -103,6 +129,8 @@ export class BankersController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Patch(':maTK')
   @ApiOperation({
     summary: 'Update detail info of a banker',
@@ -119,6 +147,8 @@ export class BankersController {
     return this.bankersService.update(id, updateBankerDto);
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Delete(':maTK')
   @ApiOperation({
     summary: 'Delete a banker',
@@ -130,20 +160,5 @@ export class BankersController {
   async remove(@Param('maTK') id: string) {
     await this.bankersService.remove(+id);
     return { data: { status: HttpStatus.OK } };
-  }
-
-  @Patch(':id/recharge')
-  @ApiOperation({
-    summary: 'Recharge money for a user',
-  })
-  @ApiParam({ name: 'maTK', description: 'Mã tài khoản', type: 'number' })
-  @ApiOkResponse({
-    description: 'Successfully recharged money for a user',
-  })
-  recharge(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() rechargeDto: RechargeDto,
-  ) {
-    return this.bankersService.recharge(id, rechargeDto);
   }
 }

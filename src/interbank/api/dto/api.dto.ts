@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsISO8601,
   IsNumberString,
-  IsNumber,
   IsEnum,
 } from 'class-validator';
 
@@ -48,7 +47,7 @@ export class TransferApiDto extends BaseApiDto {
   nguoiChuyen: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
   soTien: number;
 

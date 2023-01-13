@@ -1,11 +1,21 @@
-import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiParam,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { CryptographyService } from '../cryptography/cryptography.service';
 import { Pagination, PaginationDto } from '../pagination';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
@@ -26,6 +36,8 @@ export class InterbankController {
     private cryptographyService: CryptographyService,
   ) {}
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiTags('interbank')
   @ApiOperation({
@@ -45,6 +57,8 @@ export class InterbankController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get()
   @ApiTags('interbank')
   @ApiOperation({
@@ -62,6 +76,8 @@ export class InterbankController {
     }
   }
 
+  @Role(VaiTro.Admin)
+  @UseGuards(RoleGuard)
   @Get(':maCKN')
   @ApiTags('interbank')
   @ApiOperation({

@@ -1,6 +1,13 @@
-import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  InternalServerErrorException,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
 
 import { BanksService } from './banks.service';
@@ -10,6 +17,8 @@ import { BankResponseDto } from './dto/bank.response.dto';
 export class BanksController {
   constructor(private readonly banksService: BanksService) {}
 
+  @Role()
+  @UseGuards(RoleGuard)
   @Get()
   @ApiTags('banks')
   @ApiOperation({

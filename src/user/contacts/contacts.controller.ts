@@ -7,9 +7,13 @@ import {
   Param,
   Delete,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
+import { Role } from '../../common/decorators';
+import { RoleGuard } from '../../common/guards';
 import { JwtUser } from '../../jwt/jwt.decorator';
 import { JwtUserDto } from '../../jwt/jwt.dto';
 import {
@@ -26,7 +30,8 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 @Controller('user/contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
-
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Get('all')
   @ApiOperation({
     summary: 'Fetch a non-paginated list of contacts',
@@ -38,6 +43,8 @@ export class ContactsController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiOperation({
     summary: 'Create new contact',
@@ -52,6 +59,8 @@ export class ContactsController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Patch(':nguoiDung')
   @ApiOkWrappedResponse({ type: ContactResponseDto })
   async update(
@@ -78,6 +87,8 @@ export class ContactsController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Delete(':nguoiDung')
   @ApiOkWrappedResponse({ type: ContactResponseDto })
   async remove(

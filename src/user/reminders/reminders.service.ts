@@ -37,6 +37,15 @@ export class RemindersService {
     private userService: UserService,
   ) {}
 
+  private async findOneInfoByPayId(soTK: string) {
+    return this.prismaService.khachHang.findFirst({
+      where: {
+        taiKhoan: { taiKhoanThanhToan: { soTK } },
+      },
+      select: { hoTen: true, maTK: true },
+    });
+  }
+
   async create(maTK: number, createReminderDto: CreateReminderDto) {
     const reminder = await this.prismaService.nhacNo
       .create({
@@ -44,18 +53,19 @@ export class RemindersService {
           soTien: createReminderDto.soTien,
           noiDungNN: createReminderDto.noiDung,
           ngayTao: new Date(),
-          taiKhoanNguoiGui: { connect: { maTK: maTK } },
-          taiKhoanThanhToan: {
-            connect: { maTK: maTK, soTK: createReminderDto.soTK },
+          taiKhoanNguoiGui: {
+            connect: { soTK: createReminderDto.soTK },
           },
-          taiKhoanNguoiNhan: { connect: { maTK: createReminderDto.nguoiNhan } },
+          taiKhoanNguoiNhan: {
+            connect: { soTK: createReminderDto.soTKNguoiNhan },
+          },
         },
       })
       .catch((e) => {
         if (e instanceof PrismaClientKnownRequestError && e.code === 'P2018') {
           throw new BadRequestException({
             errorId: 'bad_reminder',
-            message: 'Invalid "maTK", "soTK" or "nguoiNhan"',
+            message: 'Invalid receiver/sender IDs',
           });
         }
         throw new InternalServerErrorException({
@@ -69,10 +79,7 @@ export class RemindersService {
   }
 
   private async notifyCreated(reminder: nhacNo) {
-    const receiver = await this.prismaService.khachHang.findUnique({
-      where: { maTK: reminder.nguoiNhan },
-      select: { hoTen: true },
-    });
+    const receiver = await this.findOneInfoByPayId(reminder.soTKNguoiNhan);
     const payload = {
       tenNguoiGui: receiver.hoTen,
       soTKNguoiGui: reminder.soTKNguoiGui,
@@ -81,7 +88,7 @@ export class RemindersService {
     };
     return this.notification.emit(
       EVENT_REMINDER_CREATED,
-      reminder.nguoiNhan,
+      receiver.maTK,
       payload,
     );
   }
@@ -93,9 +100,9 @@ export class RemindersService {
   ) {
     let query: Prisma.nhacNoWhereInput;
     if (dto.type === ReminderType.ForMe) {
-      query = { nguoiNhan: maTK };
+      query = { taiKhoanNguoiNhan: { maTK: maTK } };
     } else if (dto.type === ReminderType.ForOthers) {
-      query = { nguoiGui: maTK };
+      query = { taiKhoanNguoiGui: { maTK: maTK } };
     } else {
       throw new BadRequestException({
         errorId: 'invalid_reminder_type',
@@ -136,7 +143,7 @@ export class RemindersService {
     let reminder = await this.findOne(maNN);
     const transaction = await this.userService.transfer({
       otp: dto.otp,
-      soTK: dto.soTK,
+      soTK: reminder.soTKNguoiNhan,
       noiDung: dto.noiDung,
       loaiCK: dto.loaiCK,
       soTien: reminder.soTien,
@@ -156,11 +163,8 @@ export class RemindersService {
 
   private async notifyConfirm(reminder: nhacNo, transaction: chuyenKhoanNoiBo) {
     const [reminderSender, reminderReceiver] = await Promise.all(
-      [reminder.nguoiGui, reminder.nguoiNhan].map((id) =>
-        this.prismaService.khachHang.findUnique({
-          where: { maTK: id },
-          select: { hoTen: true },
-        }),
+      [reminder.soTKNguoiGui, reminder.soTKNguoiNhan].map((payId) =>
+        this.findOneInfoByPayId(payId),
       ),
     );
     const reminderSenderPayload = {
@@ -174,12 +178,12 @@ export class RemindersService {
     return (
       this.notification.emit(
         EVENT_REMINDER_CONFIRMED,
-        reminder.nguoiGui,
+        reminderSender.maTK,
         reminderSenderPayload,
       ) &&
       this.notification.emit(
         EVENT_REMINDER_CONFIRMED,
-        reminder.nguoiNhan,
+        reminderReceiver.maTK,
         reminderReceiverPayload,
       )
     );
@@ -196,11 +200,8 @@ export class RemindersService {
 
   private async notifyCancelled(reminder: nhacNo) {
     const [reminderSender, reminderReceiver] = await Promise.all(
-      [reminder.nguoiGui, reminder.nguoiNhan].map((id) =>
-        this.prismaService.khachHang.findUnique({
-          where: { maTK: id },
-          select: { hoTen: true },
-        }),
+      [reminder.soTKNguoiGui, reminder.soTKNguoiNhan].map((payId) =>
+        this.findOneInfoByPayId(payId),
       ),
     );
     const payload = {
@@ -211,7 +212,7 @@ export class RemindersService {
     };
     return this.notification.emitMany(
       EVENT_REMINDER_CANCELLED,
-      [reminder.nguoiGui, reminder.nguoiNhan],
+      [reminderSender.maTK, , reminderReceiver.maTK],
       payload,
     );
   }

@@ -1,9 +1,19 @@
-import { Controller, Post, Body, Get, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { VaiTro } from '@prisma/client';
 
-import { JwtUser } from '../common/decorators';
+import { JwtUser, Role } from '../common/decorators';
+import { RoleGuard } from '../common/guards';
 import { JwtUserDto } from '../jwt/jwt.dto';
 import { ApiOkWrappedResponse } from '../swagger/swagger.decorator';
+import { TransactionsService } from '../transactions/transactions.service';
 
 import { InfoResponseDto } from './dto/info.response.dto';
 import { LocalTransferDto } from './dto/transfer.dto';
@@ -13,8 +23,13 @@ import { UserService } from './user.service';
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private transactionsService: TransactionsService,
+  ) {}
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Get('info')
   @ApiOkWrappedResponse({ type: InfoResponseDto })
   async getInfo(@JwtUser() user: JwtUserDto) {
@@ -29,6 +44,8 @@ export class UserController {
     return { data };
   }
 
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Post('transfer')
   @ApiOperation({
     summary: 'User local transfer (transfer in only Karma Bank)',
@@ -43,5 +60,18 @@ export class UserController {
     } catch (e) {
       throw e;
     }
+  }
+
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
+  @Get('transactions')
+  @ApiOperation({
+    summary: 'Fetch transactions in last 30 days ',
+  })
+  async getTransactions(@JwtUser() user: JwtUserDto) {
+    const account = await this.userService.getInfo(user.maTK);
+    const accountNum = account.taiKhoanThanhToan.soTK;
+    const data = await this.transactionsService.getTransactions(accountNum);
+    return { data };
   }
 }

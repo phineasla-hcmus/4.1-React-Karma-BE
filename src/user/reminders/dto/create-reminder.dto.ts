@@ -5,7 +5,7 @@ export class CreateReminderDto {
   soTK: string;
 
   @ApiProperty()
-  nguoiNhan: number;
+  soTKNguoiNhan: string;
 
   @ApiProperty()
   soTien: number;

@@ -6,13 +6,10 @@ export class Reminder {
   maNN: number;
 
   @ApiProperty()
-  nguoiGui: string;
-
-  @ApiProperty()
   soTKNguoiGui: string;
 
   @ApiProperty()
-  nguoiNhan: string;
+  soTKNguoiNhan: string;
 
   @ApiProperty()
   soTien: number;
