@@ -5,6 +5,8 @@ import {
   Get,
   NotFoundException,
   UseGuards,
+  HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -20,7 +22,6 @@ import { VaiTro } from '@prisma/client';
 import { RoleGuard } from '../common/guards';
 import { TransactionsService } from '../transactions/transactions.service';
 import { PaymentAccountsService } from '../paymentAccounts/paymentAccounts.service';
-
 
 @ApiTags('user')
 @Controller('user')
@@ -70,5 +71,16 @@ export class UserController {
     const accountNum = account.taiKhoanThanhToan.soTK;
     const data = await this.transactionsService.getTransactions(accountNum);
     return { data };
+  }
+
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
+  @Patch('/account/deactivate')
+  @ApiOperation({
+    summary: "Deactivate uses's account ",
+  })
+  async deactivateAccount(@JwtUser() user: JwtUserDto) {
+    await this.userService.deactivateAccount(user.maTK);
+    return { data: { status: HttpStatus.OK } };
   }
 }

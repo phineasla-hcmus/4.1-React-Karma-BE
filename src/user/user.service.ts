@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  ForbiddenException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -113,6 +115,31 @@ export class UserService {
         ),
       ]);
       return transaction;
+    });
+  }
+
+  async deactivateAccount(maTK: number) {
+    const isActive = await this.prismaService.taiKhoan.findUnique({
+      select: {
+        hoatDong: true,
+      },
+      where: {
+        maTK: maTK,
+      },
+    });
+    if (!isActive) {
+      throw new ForbiddenException({
+        errorId: HttpStatus.FORBIDDEN,
+        message: 'Account is inactive',
+      });
+    }
+    await this.prismaService.taiKhoan.update({
+      where: {
+        maTK: maTK,
+      },
+      data: {
+        hoatDong: false,
+      },
     });
   }
 }
