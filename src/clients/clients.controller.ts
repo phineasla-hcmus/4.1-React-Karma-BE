@@ -102,11 +102,7 @@ export class ClientsController {
     type: ClientResponseDto,
   })
   findOne(@Param('maTK', ParseIntPipe) id: number) {
-    try {
-      return this.clientsService.findOne(id);
-    } catch (e) {
-      throw e;
-    }
+    return this.clientsService.findOne(id);
   }
 
   @Role(VaiTro.Banker)

@@ -134,11 +134,7 @@ export class TransactionsController {
     @Pagination() pagination: PaginationDto,
     @Query() query: TransactionQueryDTO,
   ) {
-    try {
-      return this.transactionsService.findAllWithPagination(pagination, query);
-    } catch (e) {
-      throw e;
-    }
+    return this.transactionsService.findAllWithPagination(pagination, query);
   }
 
   @Role(VaiTro.Banker)

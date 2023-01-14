@@ -69,11 +69,7 @@ export class InterbankController {
     @Pagination() pagination: PaginationDto,
     @Query() query: InterbankTransactionQueryDto,
   ) {
-    try {
-      return this.interbankService.findAllWithPagination(pagination, query);
-    } catch (e) {
-      throw e;
-    }
+    return this.interbankService.findAllWithPagination(pagination, query);
   }
 
   @Role(VaiTro.Admin)

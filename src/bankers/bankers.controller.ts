@@ -122,11 +122,7 @@ export class BankersController {
     @Param('maTK', ParseIntPipe)
     id: number,
   ) {
-    try {
-      return this.bankersService.findOne(id);
-    } catch (e) {
-      throw e;
-    }
+    return this.bankersService.findOne(id);
   }
 
   @Role(VaiTro.Admin)
