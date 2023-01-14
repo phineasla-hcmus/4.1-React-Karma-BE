@@ -1,6 +1,12 @@
 import { randomInt } from 'crypto';
 
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { otpChuyenKhoan, Prisma, PrismaClient } from '@prisma/client';
 import {
   PrismaClientKnownRequestError,
@@ -24,17 +30,20 @@ export class TransactionOtpService {
     } else {
       this.logger.error(e);
     }
-    return e;
+    return new InternalServerErrorException({
+      errorId: 'database_error',
+      message: 'Cannot create OTP token',
+    });
   }
 
   async findOne(soTK: string) {
-    try {
-      return this.prismaService.otpChuyenKhoan.findUnique({
+    return this.prismaService.otpChuyenKhoan
+      .findUnique({
         where: { soTK },
+      })
+      .catch((e) => {
+        throw this.didReceiveError(e);
       });
-    } catch (e) {
-      this.didReceiveError(e);
-    }
   }
 
   verify(target: Omit<otpChuyenKhoan, 'ngayTao'>, source: otpChuyenKhoan) {
@@ -51,26 +60,33 @@ export class TransactionOtpService {
 
   async upsert(data: Omit<otpChuyenKhoan, 'ngayTao' | 'otp'>) {
     const otp = randomInt(100001, 999999);
-    try {
-      // https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#unique-key-constraint-errors-on-upserts
-      return this.prismaService.otpChuyenKhoan.upsert({
+    // https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#unique-key-constraint-errors-on-upserts
+    return this.prismaService.otpChuyenKhoan
+      .upsert({
         where: { soTK: data.soTK },
         update: { ...data, otp, ngayTao: new Date() },
         create: { ...data, otp },
+      })
+      .catch((e) => {
+        const httpError = this.didReceiveError(e);
+        if (e instanceof PrismaClientKnownRequestError && e.code === 'P2003') {
+          throw new NotFoundException({
+            errorId: 'party_not_found',
+            message: 'Cannot find receiver or sender ID',
+          });
+        }
+        throw httpError;
       });
-    } catch (e) {
-      throw this.didReceiveError(e);
-    }
   }
 
   async delete(
     soTK: string,
     prismaService: PrismaClient | Prisma.TransactionClient = this.prismaService,
   ) {
-    try {
-      return prismaService.otpChuyenKhoan.delete({ where: { soTK } });
-    } catch (e) {
-      throw this.didReceiveError(e);
-    }
+    return prismaService.otpChuyenKhoan
+      .delete({ where: { soTK } })
+      .catch((e) => {
+        throw this.didReceiveError(e);
+      });
   }
 }

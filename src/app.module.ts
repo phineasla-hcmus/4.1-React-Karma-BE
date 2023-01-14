@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 
+import { AllExceptionFilter } from './all-exception.filter';
 import { AuthModule } from './auth/auth.module';
 import { BankersModule } from './bankers/bankers.module';
 import { BanksModule } from './banks/banks.module';
@@ -39,6 +40,8 @@ import { UserModule } from './user/user.module';
       provide: APP_GUARD,
       useClass: AtGuard,
     },
+    // { provide: APP_FILTER, useClass: AllExceptionFilter },
+    Logger,
   ],
 })
 export class AppModule {}

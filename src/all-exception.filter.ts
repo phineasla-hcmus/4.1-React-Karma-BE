@@ -54,7 +54,7 @@ export class AllExceptionFilter implements ExceptionFilter {
         message: context.message || 'Caught HttpException but missing message',
       };
     }
-    this.logger.error(res.errorId, undefined, res);
+    this.logger.error(JSON.stringify(res));
     response.status(exception.getStatus()).json(res);
   }
 
