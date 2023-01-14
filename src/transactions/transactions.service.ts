@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateExternalTransactionDto } from './dto/create-external-transaction.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
+import { RemindersService } from '../user/reminders/reminders.service';
 
 enum Loai {
   transfer,
@@ -222,6 +223,9 @@ export class TransactionsService {
   async getTransactions(id: string) {
     const current = new Date();
     const prior = new Date(new Date().setDate(current.getDate() - 30));
+    const recvReminderTxn = await this.getRecvRemindersTransactions(id);
+    const sendReminderTxn = await this.getSendRemindersTransactions(id);
+
     const recvList = await this.prismaService.chuyenKhoanNoiBo.findMany({
       where: {
         ngayCK: {
@@ -229,6 +233,9 @@ export class TransactionsService {
           lte: current,
         },
         nguoiNhan: id,
+        maCK: {
+          notIn: sendReminderTxn,
+        },
       },
     });
     recvList.forEach(function (element) {
@@ -241,6 +248,9 @@ export class TransactionsService {
           lte: current,
         },
         nguoiChuyen: id,
+        maCK: {
+          notIn: recvReminderTxn,
+        },
       },
     });
     sendList.forEach(function (element) {
@@ -248,5 +258,76 @@ export class TransactionsService {
     });
     const list = [...recvList, ...sendList];
     return list;
+  }
+
+  async getRemindersTransactions(id: string) {
+    const current = new Date();
+    const prior = new Date(new Date().setDate(current.getDate() - 30));
+    const recvReminderTxn = await this.getRecvRemindersTransactions(id);
+    const sendReminderTxn = await this.getSendRemindersTransactions(id);
+
+    const recvList = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      where: {
+        ngayCK: {
+          gte: prior,
+          lte: current,
+        },
+        nguoiNhan: id,
+        maCK: {
+          in: sendReminderTxn,
+        },
+      },
+    });
+    recvList.forEach(function (element) {
+      element['loai'] = Loai.receive;
+    });
+    const sendList = await this.prismaService.chuyenKhoanNoiBo.findMany({
+      where: {
+        ngayCK: {
+          gte: prior,
+          lte: current,
+        },
+        nguoiChuyen: id,
+        maCK: {
+          in: recvReminderTxn,
+        },
+      },
+    });
+    sendList.forEach(function (element) {
+      element['loai'] = Loai.transfer;
+    });
+    const list = [...recvList, ...sendList];
+    return list;
+  }
+
+  async getSendRemindersTransactions(soTK: string) {
+    const txns = await this.prismaService.nhacNo.findMany({
+      select: {
+        chuyenKhoan: true,
+      },
+      where: {
+        soTKNguoiGui: soTK,
+      },
+    });
+    let ret = [];
+    txns.forEach(function (element) {
+      ret.push(element.chuyenKhoan);
+    });
+    return ret;
+  }
+  async getRecvRemindersTransactions(soTK: string) {
+    const txns = await this.prismaService.nhacNo.findMany({
+      select: {
+        chuyenKhoan: true,
+      },
+      where: {
+        soTKNguoiNhan: soTK,
+      },
+    });
+    let ret = [];
+    txns.forEach(function (element) {
+      ret.push(element.chuyenKhoan);
+    });
+    return ret;
   }
 }
