@@ -17,9 +17,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateExternalTransactionDto } from './dto/create-external-transaction.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionQueryDTO } from './dto/transactions.query.dto';
-import { RemindersService } from '../user/reminders/reminders.service';
+import { ExternalService } from '../external/external.service';
 
-enum Loai {
+export enum Loai {
   transfer,
   receive,
 }
@@ -225,6 +225,8 @@ export class TransactionsService {
     const prior = new Date(new Date().setDate(current.getDate() - 30));
     const recvReminderTxn = await this.getRecvRemindersTransactions(id);
     const sendReminderTxn = await this.getSendRemindersTransactions(id);
+    const externalRecv = await this.getRecvExternalTransaction(id);
+    const externalSend = await this.getSendExternalTransaction(id);
 
     const recvList = await this.prismaService.chuyenKhoanNoiBo.findMany({
       where: {
@@ -256,7 +258,12 @@ export class TransactionsService {
     sendList.forEach(function (element) {
       element['loai'] = Loai.transfer;
     });
-    const list = [...recvList, ...sendList];
+    const list = [...recvList, ...sendList, ...externalRecv, ...externalSend];
+    list.sort(function (a, b) {
+      if (a['ngayCK'].getTime() - b['ngayCK'].getTime() > 0) return -1;
+      if (a['ngayCK'].getTime() - b['ngayCK'].getTime() < 0) return 1;
+      return 0;
+    });
     return list;
   }
 
@@ -329,5 +336,49 @@ export class TransactionsService {
       ret.push(element.chuyenKhoan);
     });
     return ret;
+  }
+
+  async getSendExternalTransaction(soTK: string) {
+    const list = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
+      where: {
+        tkTrong: soTK,
+        soTien: {
+          lt: 0,
+        },
+      },
+    });
+    list.forEach(function (e) {
+      e['loai'] = Loai.transfer;
+      e.soTien = -1 * e.soTien;
+      e['ngayCK'] = e.thoiGian;
+      e['nguoiChuyen'] = e.tkTrong;
+      e['nguoiNhan'] = e.tkNgoai;
+      delete e.thoiGian;
+      delete e.tkNgoai;
+      delete e.tkTrong;
+    });
+    return list;
+  }
+
+  async getRecvExternalTransaction(soTK: string) {
+    const list = await this.prismaService.chuyenKhoanNganHangNgoai.findMany({
+      where: {
+        tkTrong: soTK,
+        soTien: {
+          gt: 0,
+        },
+      },
+    });
+    list.forEach(function (e) {
+      e['loai'] = Loai.receive;
+      e.soTien = e.soTien;
+      e['ngayCK'] = e.thoiGian;
+      e['nguoiChuyen'] = e.tkNgoai;
+      e['nguoiNhan'] = e.tkTrong;
+      delete e.thoiGian;
+      delete e.tkNgoai;
+      delete e.tkTrong;
+    });
+    return list;
   }
 }
