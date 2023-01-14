@@ -42,7 +42,9 @@ export class EmailService {
     filename: string,
     context: object,
   ) {
-    const template = compile(await readFile(join('template', filename)));
+    const template = compile(
+      await readFile(join('template', filename), 'utf-8'),
+    );
     const info = await this.transporter.sendMail({
       from: this.configService.get('EMAIL'),
       to,

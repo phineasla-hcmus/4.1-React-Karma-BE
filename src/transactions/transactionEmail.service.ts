@@ -25,7 +25,7 @@ export class TransactionEmailService {
     return this.emailService.sendEmail(
       user.khachHang.email,
       'Verify your transaction',
-      'confirm-transaction/index.html',
+      'confirm-transaction.handlebars',
       {
         name: user.khachHang.hoTen,
         destination: this.censor(nguoiNhan, 0, nguoiNhan.length - 4),
