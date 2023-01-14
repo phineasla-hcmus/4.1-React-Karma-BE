@@ -120,9 +120,6 @@ export class UserService {
 
   async deactivateAccount(maTK: number) {
     const isActive = await this.prismaService.taiKhoan.findUnique({
-      select: {
-        hoatDong: true,
-      },
       where: {
         maTK: maTK,
       },
@@ -141,5 +138,14 @@ export class UserService {
         hoatDong: false,
       },
     });
+    const paymentAccount = await this.getInfo(maTK);
+    if (!paymentAccount) {
+      throw new NotFoundException({
+        errorId: HttpStatus.NOT_FOUND,
+        message: 'Payment account not found',
+      });
+    }
+    const soTK = paymentAccount.taiKhoanThanhToan.soTK;
+    await this.paymentAccountService.deactivatePaymentAccount(soTK);
   }
 }
