@@ -69,7 +69,7 @@ export class RemindersController {
    */
   @Role(VaiTro.User)
   @UseGuards(RoleGuard)
-  @Patch()
+  @Patch(':maNN')
   @ApiOperation({ summary: 'Checkout a reminder' })
   @ApiOkWrappedResponse({ type: OmitType(Reminder, ['noiDungXoa'] as const) })
   @ApiQuery({ name: 'maNN', description: 'Reminder ID' })
@@ -92,7 +92,7 @@ export class RemindersController {
   async cancel(
     @JwtUser() user: JwtUserDto,
     @Param('maNN', ParseIntPipe) maNN: number,
-    dto: CancelReminderDto,
+    @Body() dto: CancelReminderDto,
   ) {
     const reminder = await this.remindersService.findOne(maNN);
     if (!reminder) {
@@ -104,6 +104,7 @@ export class RemindersController {
     if (reminder.trangThai === TrangThaiNhacNo.done) {
       return { data: reminder };
     }
+    console.log('dto', dto);
     const data = await this.remindersService.cancel(maNN, dto);
     return { data };
   }
