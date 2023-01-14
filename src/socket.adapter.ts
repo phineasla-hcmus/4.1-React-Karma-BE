@@ -20,18 +20,20 @@ export class SocketAdapter extends IoAdapter {
     const token: string | false =
       bearerToken?.startsWith(bearer) &&
       bearerToken.substring(bearer.length, bearerToken.length);
-    const user = verify(
-      token,
-      this.config.getOrThrow('AT_SECRET'),
-    ) as JwtPayloadDto;
-
-    if (!user) {
+    let user: JwtPayloadDto;
+    try {
+      user = verify(
+        token,
+        this.config.getOrThrow('AT_SECRET'),
+      ) as JwtPayloadDto;
+    } catch (e) {
       next(
         new UnauthorizedException({
           errorId: 'unauthorized',
           message: 'Cannot validate token',
         }),
       );
+      return;
     }
     socket.join(String(user.maTK));
     socket.data = user;
@@ -40,7 +42,7 @@ export class SocketAdapter extends IoAdapter {
 
   createIOServer(port: number, options?: any) {
     const server: Server = super.createIOServer(port, options);
-    server.use(this.authMiddleware);
+    server.use(this.authMiddleware.bind(this));
     return server;
   }
 }
