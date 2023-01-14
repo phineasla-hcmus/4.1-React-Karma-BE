@@ -38,8 +38,8 @@ async function main() {
     },
   });
 
-  // 5 user
-  for (let i = 1; i < 6; i++) {
+  // 8 user
+  for (let i = 1; i < 9; i++) {
     const firsName = faker.name.firstName();
     const lastName = faker.name.lastName();
     const fullName = firsName + ' ' + lastName;
