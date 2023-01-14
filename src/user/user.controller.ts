@@ -76,6 +76,21 @@ export class UserController {
 
   @Role(VaiTro.User)
   @UseGuards(RoleGuard)
+  @Get('transactions/reminders')
+  @ApiOperation({
+    summary: 'Fetch reminder transactions in last 30 days ',
+  })
+  async getReminderTransactions(@JwtUser() user: JwtUserDto) {
+    const account = await this.userService.getInfo(user.maTK);
+    const accountNum = account.taiKhoanThanhToan.soTK;
+    const data = await this.transactionsService.getRemindersTransactions(
+      accountNum,
+    );
+    return { data };
+  }
+
+  @Role(VaiTro.User)
+  @UseGuards(RoleGuard)
   @Patch('/account/deactivate')
   @ApiOperation({
     summary: "Deactivate uses's account ",
